@@ -1,0 +1,6 @@
+Symlinking /home/sahil/carla-ros-bridge/catkin_ws/devel/share/carla_walker_agent/cmake/carla_walker_agentConfig.cmake
+Symlinking /home/sahil/carla-ros-bridge/catkin_ws/devel/share/carla_walker_agent/cmake/carla_walker_agentConfig-version.cmake
+Symlinking /home/sahil/carla-ros-bridge/catkin_ws/devel/lib/pkgconfig/carla_walker_agent.pc
+Symlinking /home/sahil/carla-ros-bridge/catkin_ws/devel/lib/carla_walker_agent/cmake.lock
+Symlinking /home/sahil/carla-ros-bridge/catkin_ws/devel/lib/carla_walker_agent/carla_walker_agent.py
+Symlinking /home/sahil/carla-ros-bridge/catkin_ws/devel/lib/python3/dist-packages/carla_walker_agent/__init__.py

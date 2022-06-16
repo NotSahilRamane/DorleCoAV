@@ -581,7 +581,7 @@ void CoreWrapper::onInit()
 				{
 					NODELET_INFO("Subscribe to inter odom + info messages");
 					interOdomSync_ = new message_filters::Synchronizer<MyExactInterOdomSyncPolicy>(MyExactInterOdomSyncPolicy(100), interOdomSyncSub_, interOdomInfoSyncSub_);
-					interOdomSync_->registerCallback(boost::bind(&CoreWrapper::interOdomInfoCallback, this, boost::placeholders::_1, boost::placeholders::_2));
+					interOdomSync_->registerCallback(boost::bind(&CoreWrapper::interOdomInfoCallback, this, _1, _2));
 					interOdomSyncSub_.subscribe(nh, "inter_odom", 100);
 					interOdomInfoSyncSub_.subscribe(nh, "inter_odom_info", 100);
 				}
@@ -1028,13 +1028,6 @@ bool CoreWrapper::odomUpdate(const nav_msgs::OdometryConstPtr & odomMsg, ros::Ti
 		lastPoseIntermediate_ = false;
 		lastPose_ = odom;
 		lastPoseStamp_ = stamp;
-		lastPoseVelocity_.resize(6);
-		lastPoseVelocity_[0] = odomMsg->twist.twist.linear.x;
-		lastPoseVelocity_[1] = odomMsg->twist.twist.linear.y;
-		lastPoseVelocity_[2] = odomMsg->twist.twist.linear.z;
-		lastPoseVelocity_[3] = odomMsg->twist.twist.angular.x;
-		lastPoseVelocity_[4] = odomMsg->twist.twist.angular.y;
-		lastPoseVelocity_[5] = odomMsg->twist.twist.angular.z;
 
 		// Only update variance if odom is not null
 		if(!odom.isNull())
@@ -1120,7 +1113,6 @@ bool CoreWrapper::odomTFUpdate(const ros::Time & stamp)
 		lastPoseIntermediate_ = false;
 		lastPose_ = odom;
 		lastPoseStamp_ = stamp;
-		lastPoseVelocity_.clear();
 
 		bool ignoreFrame = false;
 		if(stamp.toSec() == 0.0)
@@ -1428,7 +1420,6 @@ void CoreWrapper::commonDepthCallbackImpl(
 	process(lastPoseStamp_,
 			data,
 			lastPose_,
-			lastPoseVelocity_,
 			odomFrameId,
 			covariance_,
 			odomInfo,
@@ -1677,7 +1668,6 @@ void CoreWrapper::commonStereoCallback(
 	process(lastPoseStamp_,
 			data,
 			lastPose_,
-			lastPoseVelocity_,
 			odomFrameId,
 			covariance_,
 			odomInfo,
@@ -1813,7 +1803,6 @@ void CoreWrapper::commonLaserScanCallback(
 	process(lastPoseStamp_,
 			data,
 			lastPose_,
-			lastPoseVelocity_,
 			odomFrameId,
 			covariance_,
 			odomInfo,
@@ -1872,7 +1861,6 @@ void CoreWrapper::commonOdomCallback(
 	process(lastPoseStamp_,
 			data,
 			lastPose_,
-			lastPoseVelocity_,
 			odomFrameId,
 			covariance_,
 			odomInfo,
@@ -1885,7 +1873,6 @@ void CoreWrapper::process(
 		const ros::Time & stamp,
 		SensorData & data,
 		const Transform & odom,
-		const std::vector<float> & odomVelocityIn,
 		const std::string & odomFrameId,
 		const cv::Mat & odomCovariance,
 		const OdometryInfo & odomInfo,
@@ -1970,16 +1957,6 @@ void CoreWrapper::process(
 							odomVelocity[4] = pitch/info.interval;
 							odomVelocity[5] = yaw/info.interval;
 						}
-					}
-					if(odomVelocity.empty())
-					{
-						odomVelocity.resize(6);
-						odomVelocity[0] = iter->first.twist.twist.linear.x;
-						odomVelocity[1] = iter->first.twist.twist.linear.y;
-						odomVelocity[2] = iter->first.twist.twist.linear.z;
-						odomVelocity[3] = iter->first.twist.twist.angular.x;
-						odomVelocity[4] = iter->first.twist.twist.angular.y;
-						odomVelocity[5] = iter->first.twist.twist.angular.z;
 					}
 
 					rtabmap_.process(interData, interOdom, covariance, odomVelocity, externalStats);
@@ -2147,10 +2124,6 @@ void CoreWrapper::process(
 				odomVelocity[4] = pitch/odomInfo.interval;
 				odomVelocity[5] = yaw/odomInfo.interval;
 			}
-		}
-		if(odomVelocity.empty())
-		{
-			odomVelocity = odomVelocityIn;
 		}
 		if(rtabmapROSStats_.size())
 		{
@@ -2870,7 +2843,6 @@ bool CoreWrapper::resetRtabmapCallback(std_srvs::Empty::Request&, std_srvs::Empt
 	rtabmap_.resetMemory();
 	covariance_ = cv::Mat();
 	lastPose_.setIdentity();
-	lastPoseVelocity_.clear();
 	lastPoseIntermediate_ = false;
 	currentMetricGoal_.setNull();
 	lastPublishedMetricGoal_.setNull();
@@ -2961,7 +2933,6 @@ bool CoreWrapper::loadDatabaseCallback(rtabmap_ros::LoadDatabase::Request& req, 
 
 	covariance_ = cv::Mat();
 	lastPose_.setIdentity();
-	lastPoseVelocity_.clear();
 	lastPoseIntermediate_ = false;
 	currentMetricGoal_.setNull();
 	lastPublishedMetricGoal_.setNull();
@@ -3087,7 +3058,6 @@ bool CoreWrapper::backupDatabaseCallback(std_srvs::Empty::Request&, std_srvs::Em
 
 	covariance_ = cv::Mat();
 	lastPose_.setIdentity();
-	lastPoseVelocity_.clear();
 	currentMetricGoal_.setNull();
 	lastPublishedMetricGoal_.setNull();
 	goalFrameId_.clear();
@@ -4159,8 +4129,8 @@ void CoreWrapper::publishStats(const ros::Time & stamp)
 			int id = rtabmap::graph::findNearestNode(nodesOnly, rtabmap_.getLastLocalizationPose());
 			if(id>0)
 			{
-				std::map<int, int> ids = rtabmap_.getMemory()->getNeighborsId(id, 0, 0, true, false, true);
-				std::multimap<int, int> missingIds;
+				std::map<int, int> ids = rtabmap_.getMemory()->getNeighborsId(id, 0, 0, false, false, true);
+				std::map<int, int> missingIds;
 				for(std::map<int, int>::iterator iter=ids.begin(); iter!=ids.end(); ++iter)
 				{
 					if(nodesToRepublish_.find(iter->first) != nodesToRepublish_.end())
@@ -4187,7 +4157,7 @@ void CoreWrapper::publishStats(const ros::Time & stamp)
 
 				int loaded = 0;
 				std::stringstream stream;
-				for(std::multimap<int, int>::iterator iter=missingIds.begin(); iter!=missingIds.end() && loaded<maxNodesRepublished_; ++iter)
+				for(std::map<int, int>::iterator iter=missingIds.begin(); iter!=missingIds.end() && loaded<maxNodesRepublished_; ++iter)
 				{
 					signatures.insert(std::make_pair(iter->second, rtabmap_.getMemory()->getNodeData(iter->second, true, true, true, true)));
 					nodesToRepublish_.erase(iter->second);
@@ -4467,9 +4437,9 @@ void CoreWrapper::publishCurrentGoal(const ros::Time & stamp)
 				goal.target_pose = poseMsg;
 
 				mbClient_->sendGoal(goal,
-						boost::bind(&CoreWrapper::goalDoneCb, this, boost::placeholders::_1, boost::placeholders::_2),
+						boost::bind(&CoreWrapper::goalDoneCb, this, _1, _2),
 						boost::bind(&CoreWrapper::goalActiveCb, this),
-						boost::bind(&CoreWrapper::goalFeedbackCb, this, boost::placeholders::_1));
+						boost::bind(&CoreWrapper::goalFeedbackCb, this, _1));
 				lastPublishedMetricGoal_ = currentMetricGoal_;
 			}
 			else

@@ -1,3 +1,3 @@
-Symlinking /home/sahil/DorleCo/devel/share/traffic_lights_detector/cmake/traffic_lights_detectorConfig.cmake
-Symlinking /home/sahil/DorleCo/devel/share/traffic_lights_detector/cmake/traffic_lights_detectorConfig-version.cmake
-Symlinking /home/sahil/DorleCo/devel/lib/pkgconfig/traffic_lights_detector.pc
+Linked: (/home/sahil/DorleCo/devel/.private/traffic_lights_detector/share/traffic_lights_detector/cmake/traffic_lights_detectorConfig.cmake, /home/sahil/DorleCo/devel/share/traffic_lights_detector/cmake/traffic_lights_detectorConfig.cmake)
+Linked: (/home/sahil/DorleCo/devel/.private/traffic_lights_detector/share/traffic_lights_detector/cmake/traffic_lights_detectorConfig-version.cmake, /home/sahil/DorleCo/devel/share/traffic_lights_detector/cmake/traffic_lights_detectorConfig-version.cmake)
+Linked: (/home/sahil/DorleCo/devel/.private/traffic_lights_detector/lib/pkgconfig/traffic_lights_detector.pc, /home/sahil/DorleCo/devel/lib/pkgconfig/traffic_lights_detector.pc)

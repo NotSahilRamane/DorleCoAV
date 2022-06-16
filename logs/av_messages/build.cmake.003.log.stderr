@@ -1,7 +1,0 @@
-[31m[1mCMake Error[0m at /opt/ros/noetic/share/genmsg/cmake/genmsg-extras.cmake:197 (message):
-  generate_messages() must be called before catkin_package() in project
-  'av_messages'
-[36mCall Stack (most recent call first):[0m
-  CMakeLists.txt:78 (generate_messages)
-
-

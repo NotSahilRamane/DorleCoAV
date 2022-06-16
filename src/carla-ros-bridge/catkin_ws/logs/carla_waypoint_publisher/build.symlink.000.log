@@ -1,0 +1,6 @@
+Symlinking /home/sahil/carla-ros-bridge/catkin_ws/devel/share/carla_waypoint_publisher/cmake/carla_waypoint_publisherConfig-version.cmake
+Symlinking /home/sahil/carla-ros-bridge/catkin_ws/devel/share/carla_waypoint_publisher/cmake/carla_waypoint_publisherConfig.cmake
+Symlinking /home/sahil/carla-ros-bridge/catkin_ws/devel/lib/carla_waypoint_publisher/carla_waypoint_publisher.py
+Symlinking /home/sahil/carla-ros-bridge/catkin_ws/devel/lib/carla_waypoint_publisher/cmake.lock
+Symlinking /home/sahil/carla-ros-bridge/catkin_ws/devel/lib/pkgconfig/carla_waypoint_publisher.pc
+Symlinking /home/sahil/carla-ros-bridge/catkin_ws/devel/lib/python3/dist-packages/carla_waypoint_publisher/__init__.py

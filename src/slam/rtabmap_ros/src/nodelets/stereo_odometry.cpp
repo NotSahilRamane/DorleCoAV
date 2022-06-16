@@ -88,16 +88,12 @@ private:
 
 		bool approxSync = false;
 		bool subscribeRGBD = false;
-		double approxSyncMaxInterval = 0.0;
 		pnh.param("approx_sync", approxSync, approxSync);
-		pnh.param("approx_sync_max_interval", approxSyncMaxInterval, approxSyncMaxInterval);
 		pnh.param("queue_size", queueSize_, queueSize_);
 		pnh.param("subscribe_rgbd", subscribeRGBD, subscribeRGBD);
 		pnh.param("keep_color", keepColor_, keepColor_);
 
 		NODELET_INFO("StereoOdometry: approx_sync = %s", approxSync?"true":"false");
-		if(approxSync)
-			NODELET_INFO("StereoOdometry: approx_sync_max_interval = %f", approxSyncMaxInterval);
 		NODELET_INFO("StereoOdometry: queue_size = %d", queueSize_);
 		NODELET_INFO("StereoOdometry: subscribe_rgbd = %s", subscribeRGBD?"true":"false");
 		NODELET_INFO("StereoOdometry: keep_color = %s", keepColor_?"true":"false");
@@ -131,21 +127,18 @@ private:
 			if(approxSync)
 			{
 				approxSync_ = new message_filters::Synchronizer<MyApproxSyncPolicy>(MyApproxSyncPolicy(queueSize_), imageRectLeft_, imageRectRight_, cameraInfoLeft_, cameraInfoRight_);
-				if(approxSyncMaxInterval>0.0)
-					approxSync_->setMaxIntervalDuration(ros::Duration(approxSyncMaxInterval));
-				approxSync_->registerCallback(boost::bind(&StereoOdometry::callback, this, boost::placeholders::_1, boost::placeholders::_2, boost::placeholders::_3, boost::placeholders::_4));
+				approxSync_->registerCallback(boost::bind(&StereoOdometry::callback, this, _1, _2, _3, _4));
 			}
 			else
 			{
 				exactSync_ = new message_filters::Synchronizer<MyExactSyncPolicy>(MyExactSyncPolicy(queueSize_), imageRectLeft_, imageRectRight_, cameraInfoLeft_, cameraInfoRight_);
-				exactSync_->registerCallback(boost::bind(&StereoOdometry::callback, this, boost::placeholders::_1, boost::placeholders::_2, boost::placeholders::_3, boost::placeholders::_4));
+				exactSync_->registerCallback(boost::bind(&StereoOdometry::callback, this, _1, _2, _3, _4));
 			}
 
 
-			subscribedTopicsMsg = uFormat("\n%s subscribed to (%s sync%s):\n   %s \\\n   %s \\\n   %s \\\n   %s",
+			subscribedTopicsMsg = uFormat("\n%s subscribed to (%s sync):\n   %s \\\n   %s \\\n   %s \\\n   %s",
 					getName().c_str(),
 					approxSync?"approx":"exact",
-					approxSync&&approxSyncMaxInterval!=0.0?uFormat(", max interval=%fs", approxSyncMaxInterval).c_str():"",
 					imageRectLeft_.getTopic().c_str(),
 					imageRectRight_.getTopic().c_str(),
 					cameraInfoLeft_.getTopic().c_str(),
@@ -201,18 +194,6 @@ private:
 			if(localTransform.isNull())
 			{
 				return;
-			}
-
-			double stampDiff = fabs(imageRectLeft->header.stamp.toSec() - imageRectRight->header.stamp.toSec());
-			if(stampDiff > 0.010)
-			{
-				NODELET_WARN("The time difference between left and right frames is "
-						"high (diff=%fs, left=%fs, right=%fs). If your left and right cameras are hardware "
-						"synchronized, use approx_sync:=false. Otherwise, you may want "
-						"to set approx_sync_max_interval lower than 0.01s to reject spurious bad synchronizations.",
-						stampDiff,
-						imageRectLeft->header.stamp.toSec(),
-						imageRectRight->header.stamp.toSec());
 			}
 
 			int quality = -1;
@@ -496,13 +477,13 @@ protected:
 		{
 			delete approxSync_;
 			approxSync_ = new message_filters::Synchronizer<MyApproxSyncPolicy>(MyApproxSyncPolicy(queueSize_), imageRectLeft_, imageRectRight_, cameraInfoLeft_, cameraInfoRight_);
-			approxSync_->registerCallback(boost::bind(&StereoOdometry::callback, this, boost::placeholders::_1, boost::placeholders::_2, boost::placeholders::_3, boost::placeholders::_4));
+			approxSync_->registerCallback(boost::bind(&StereoOdometry::callback, this, _1, _2, _3, _4));
 		}
 		if(exactSync_)
 		{
 			delete exactSync_;
 			exactSync_ = new message_filters::Synchronizer<MyExactSyncPolicy>(MyExactSyncPolicy(queueSize_), imageRectLeft_, imageRectRight_, cameraInfoLeft_, cameraInfoRight_);
-			exactSync_->registerCallback(boost::bind(&StereoOdometry::callback, this, boost::placeholders::_1, boost::placeholders::_2, boost::placeholders::_3, boost::placeholders::_4));
+			exactSync_->registerCallback(boost::bind(&StereoOdometry::callback, this, _1, _2, _3, _4));
 		}
 	}
 

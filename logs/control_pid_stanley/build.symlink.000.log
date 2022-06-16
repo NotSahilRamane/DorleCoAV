@@ -1,3 +1,3 @@
-Symlinking /home/sahil/DorleCo/devel/share/control_pid_stanley/cmake/control_pid_stanleyConfig.cmake
-Symlinking /home/sahil/DorleCo/devel/share/control_pid_stanley/cmake/control_pid_stanleyConfig-version.cmake
-Symlinking /home/sahil/DorleCo/devel/lib/pkgconfig/control_pid_stanley.pc
+Linked: (/home/sahil/DorleCo/devel/.private/control_pid_stanley/share/control_pid_stanley/cmake/control_pid_stanleyConfig.cmake, /home/sahil/DorleCo/devel/share/control_pid_stanley/cmake/control_pid_stanleyConfig.cmake)
+Linked: (/home/sahil/DorleCo/devel/.private/control_pid_stanley/share/control_pid_stanley/cmake/control_pid_stanleyConfig-version.cmake, /home/sahil/DorleCo/devel/share/control_pid_stanley/cmake/control_pid_stanleyConfig-version.cmake)
+Linked: (/home/sahil/DorleCo/devel/.private/control_pid_stanley/lib/pkgconfig/control_pid_stanley.pc, /home/sahil/DorleCo/devel/lib/pkgconfig/control_pid_stanley.pc)

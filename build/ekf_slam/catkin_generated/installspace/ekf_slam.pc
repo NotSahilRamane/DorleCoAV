@@ -5,4 +5,4 @@ Description: Description of ekf_slam
 Version: 0.0.0
 Cflags: 
 Libs: -L${prefix}/lib 
-Requires: 
+Requires: std_msgs geometry_msgs nav_msgs sensor_msgs av_messages

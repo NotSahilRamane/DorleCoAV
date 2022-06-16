@@ -1,3 +1,3 @@
-Symlinking /home/sahil/DorleCo/devel/share/stereo_depth/cmake/stereo_depthConfig-version.cmake
-Symlinking /home/sahil/DorleCo/devel/share/stereo_depth/cmake/stereo_depthConfig.cmake
-Symlinking /home/sahil/DorleCo/devel/lib/pkgconfig/stereo_depth.pc
+Linked: (/home/sahil/DorleCo/devel/.private/stereo_depth/share/stereo_depth/cmake/stereo_depthConfig-version.cmake, /home/sahil/DorleCo/devel/share/stereo_depth/cmake/stereo_depthConfig-version.cmake)
+Linked: (/home/sahil/DorleCo/devel/.private/stereo_depth/share/stereo_depth/cmake/stereo_depthConfig.cmake, /home/sahil/DorleCo/devel/share/stereo_depth/cmake/stereo_depthConfig.cmake)
+Linked: (/home/sahil/DorleCo/devel/.private/stereo_depth/lib/pkgconfig/stereo_depth.pc, /home/sahil/DorleCo/devel/lib/pkgconfig/stereo_depth.pc)
