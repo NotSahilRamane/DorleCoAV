@@ -1,1 +1,0 @@
-/home/sahil/DorleCo/devel/.private/global_planner/lib/pkgconfig/global_planner.pc

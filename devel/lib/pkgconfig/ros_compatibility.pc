@@ -1,1 +1,0 @@
-/home/sahil/DorleCo/devel/.private/ros_compatibility/lib/pkgconfig/ros_compatibility.pc

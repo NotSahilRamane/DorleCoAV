@@ -1,8 +1,0 @@
-carla-ros-bridge/catkin_ws/src/ros-bridge/carla_twist_to_control
-/home/sahil/DorleCo/devel/.private/carla_twist_to_control/cmake.lock /home/sahil/DorleCo/devel/./cmake.lock
-/home/sahil/DorleCo/devel/.private/carla_twist_to_control/share/carla_twist_to_control/cmake/carla_twist_to_controlConfig-version.cmake /home/sahil/DorleCo/devel/share/carla_twist_to_control/cmake/carla_twist_to_controlConfig-version.cmake
-/home/sahil/DorleCo/devel/.private/carla_twist_to_control/share/carla_twist_to_control/cmake/carla_twist_to_controlConfig.cmake /home/sahil/DorleCo/devel/share/carla_twist_to_control/cmake/carla_twist_to_controlConfig.cmake
-/home/sahil/DorleCo/devel/.private/carla_twist_to_control/lib/carla_twist_to_control/cmake.lock /home/sahil/DorleCo/devel/lib/carla_twist_to_control/cmake.lock
-/home/sahil/DorleCo/devel/.private/carla_twist_to_control/lib/carla_twist_to_control/carla_twist_to_control.py /home/sahil/DorleCo/devel/lib/carla_twist_to_control/carla_twist_to_control.py
-/home/sahil/DorleCo/devel/.private/carla_twist_to_control/lib/pkgconfig/carla_twist_to_control.pc /home/sahil/DorleCo/devel/lib/pkgconfig/carla_twist_to_control.pc
-/home/sahil/DorleCo/devel/.private/carla_twist_to_control/lib/python3/dist-packages/carla_twist_to_control/__init__.py /home/sahil/DorleCo/devel/lib/python3/dist-packages/carla_twist_to_control/__init__.py

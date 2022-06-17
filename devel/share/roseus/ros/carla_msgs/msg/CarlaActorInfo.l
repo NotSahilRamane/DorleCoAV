@@ -1,1 +1,0 @@
-/home/sahil/DorleCo/devel/.private/carla_msgs/share/roseus/ros/carla_msgs/msg/CarlaActorInfo.l

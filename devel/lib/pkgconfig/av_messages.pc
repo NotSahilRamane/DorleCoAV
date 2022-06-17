@@ -1,1 +1,0 @@
-/home/sahil/DorleCo/devel/.private/av_messages/lib/pkgconfig/av_messages.pc

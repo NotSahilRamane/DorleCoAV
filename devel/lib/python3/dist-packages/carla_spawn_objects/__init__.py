@@ -1,1 +1,0 @@
-/home/sahil/DorleCo/devel/.private/carla_spawn_objects/lib/python3/dist-packages/carla_spawn_objects/__init__.py

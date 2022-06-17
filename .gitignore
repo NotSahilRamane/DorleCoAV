@@ -1,0 +1,8 @@
+build/
+devel/
+logs/
+src/carla-ros-bridge/catkin_ws/build/
+src/carla-ros-bridge/catkin_ws/devel/
+src/carla-ros-bridge/catkin_ws/logs/
+src/carla-ros-bridge/catkin_ws/.catkin_tools/
+src/carla-ros-bridge/catkin_ws/src/ros-bridge/.pylintrc

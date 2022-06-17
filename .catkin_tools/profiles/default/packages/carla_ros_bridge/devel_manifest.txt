@@ -1,6 +1,0 @@
-carla-ros-bridge/catkin_ws/src/ros-bridge/carla_ros_bridge
-/home/sahil/DorleCo/devel/.private/carla_ros_bridge/cmake.lock /home/sahil/DorleCo/devel/./cmake.lock
-/home/sahil/DorleCo/devel/.private/carla_ros_bridge/share/carla_ros_bridge/cmake/carla_ros_bridgeConfig.cmake /home/sahil/DorleCo/devel/share/carla_ros_bridge/cmake/carla_ros_bridgeConfig.cmake
-/home/sahil/DorleCo/devel/.private/carla_ros_bridge/share/carla_ros_bridge/cmake/carla_ros_bridgeConfig-version.cmake /home/sahil/DorleCo/devel/share/carla_ros_bridge/cmake/carla_ros_bridgeConfig-version.cmake
-/home/sahil/DorleCo/devel/.private/carla_ros_bridge/lib/pkgconfig/carla_ros_bridge.pc /home/sahil/DorleCo/devel/lib/pkgconfig/carla_ros_bridge.pc
-/home/sahil/DorleCo/devel/.private/carla_ros_bridge/lib/python3/dist-packages/carla_ros_bridge/__init__.py /home/sahil/DorleCo/devel/lib/python3/dist-packages/carla_ros_bridge/__init__.py

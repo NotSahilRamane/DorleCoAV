@@ -1,9 +1,0 @@
-ros-bridge/carla_spawn_objects
-/home/sahil/carla-ros-bridge/catkin_ws/devel/.private/carla_spawn_objects/cmake.lock /home/sahil/carla-ros-bridge/catkin_ws/devel/./cmake.lock
-/home/sahil/carla-ros-bridge/catkin_ws/devel/.private/carla_spawn_objects/share/carla_spawn_objects/cmake/carla_spawn_objectsConfig.cmake /home/sahil/carla-ros-bridge/catkin_ws/devel/share/carla_spawn_objects/cmake/carla_spawn_objectsConfig.cmake
-/home/sahil/carla-ros-bridge/catkin_ws/devel/.private/carla_spawn_objects/share/carla_spawn_objects/cmake/carla_spawn_objectsConfig-version.cmake /home/sahil/carla-ros-bridge/catkin_ws/devel/share/carla_spawn_objects/cmake/carla_spawn_objectsConfig-version.cmake
-/home/sahil/carla-ros-bridge/catkin_ws/devel/.private/carla_spawn_objects/lib/pkgconfig/carla_spawn_objects.pc /home/sahil/carla-ros-bridge/catkin_ws/devel/lib/pkgconfig/carla_spawn_objects.pc
-/home/sahil/carla-ros-bridge/catkin_ws/devel/.private/carla_spawn_objects/lib/python3/dist-packages/carla_spawn_objects/__init__.py /home/sahil/carla-ros-bridge/catkin_ws/devel/lib/python3/dist-packages/carla_spawn_objects/__init__.py
-/home/sahil/carla-ros-bridge/catkin_ws/devel/.private/carla_spawn_objects/lib/carla_spawn_objects/set_initial_pose.py /home/sahil/carla-ros-bridge/catkin_ws/devel/lib/carla_spawn_objects/set_initial_pose.py
-/home/sahil/carla-ros-bridge/catkin_ws/devel/.private/carla_spawn_objects/lib/carla_spawn_objects/cmake.lock /home/sahil/carla-ros-bridge/catkin_ws/devel/lib/carla_spawn_objects/cmake.lock
-/home/sahil/carla-ros-bridge/catkin_ws/devel/.private/carla_spawn_objects/lib/carla_spawn_objects/carla_spawn_objects.py /home/sahil/carla-ros-bridge/catkin_ws/devel/lib/carla_spawn_objects/carla_spawn_objects.py

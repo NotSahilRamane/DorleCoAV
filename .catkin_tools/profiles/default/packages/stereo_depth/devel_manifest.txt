@@ -1,5 +1,0 @@
-perception/stereo_depth
-/home/sahil/DorleCo/devel/.private/stereo_depth/cmake.lock /home/sahil/DorleCo/devel/./cmake.lock
-/home/sahil/DorleCo/devel/.private/stereo_depth/share/stereo_depth/cmake/stereo_depthConfig-version.cmake /home/sahil/DorleCo/devel/share/stereo_depth/cmake/stereo_depthConfig-version.cmake
-/home/sahil/DorleCo/devel/.private/stereo_depth/share/stereo_depth/cmake/stereo_depthConfig.cmake /home/sahil/DorleCo/devel/share/stereo_depth/cmake/stereo_depthConfig.cmake
-/home/sahil/DorleCo/devel/.private/stereo_depth/lib/pkgconfig/stereo_depth.pc /home/sahil/DorleCo/devel/lib/pkgconfig/stereo_depth.pc

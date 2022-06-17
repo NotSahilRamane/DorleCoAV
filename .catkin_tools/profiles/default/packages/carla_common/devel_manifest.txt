@@ -1,8 +1,0 @@
-carla-ros-bridge/catkin_ws/src/ros-bridge/carla_common
-/home/sahil/DorleCo/devel/.private/carla_common/cmake.lock /home/sahil/DorleCo/devel/./cmake.lock
-/home/sahil/DorleCo/devel/.private/carla_common/share/carla_common/cmake/carla_commonConfig.cmake /home/sahil/DorleCo/devel/share/carla_common/cmake/carla_commonConfig.cmake
-/home/sahil/DorleCo/devel/.private/carla_common/share/carla_common/cmake/carla_commonConfig-version.cmake /home/sahil/DorleCo/devel/share/carla_common/cmake/carla_commonConfig-version.cmake
-/home/sahil/DorleCo/devel/.private/carla_common/lib/carla_common/cmake.lock /home/sahil/DorleCo/devel/lib/carla_common/cmake.lock
-/home/sahil/DorleCo/devel/.private/carla_common/lib/carla_common/transforms.py /home/sahil/DorleCo/devel/lib/carla_common/transforms.py
-/home/sahil/DorleCo/devel/.private/carla_common/lib/pkgconfig/carla_common.pc /home/sahil/DorleCo/devel/lib/pkgconfig/carla_common.pc
-/home/sahil/DorleCo/devel/.private/carla_common/lib/python3/dist-packages/carla_common/__init__.py /home/sahil/DorleCo/devel/lib/python3/dist-packages/carla_common/__init__.py

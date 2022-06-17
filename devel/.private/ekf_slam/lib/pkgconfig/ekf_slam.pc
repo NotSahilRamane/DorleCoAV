@@ -1,8 +1,0 @@
-prefix=/home/sahil/DorleCo/devel/.private/ekf_slam
-
-Name: ekf_slam
-Description: Description of ekf_slam
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: std_msgs geometry_msgs nav_msgs sensor_msgs av_messages

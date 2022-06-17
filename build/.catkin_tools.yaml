@@ -1,6 +1,0 @@
-devel_space: /home/sahil/DorleCo/devel
-install: false
-install_space: /home/sahil/DorleCo/install
-profile: default
-source_space: /home/sahil/DorleCo/src
-workspace: /home/sahil/DorleCo

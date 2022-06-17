@@ -1,6 +1,0 @@
-carla-ros-bridge/catkin_ws/src/ros-bridge/rviz_carla_plugin
-/home/sahil/DorleCo/devel/.private/rviz_carla_plugin/cmake.lock /home/sahil/DorleCo/devel/./cmake.lock
-/home/sahil/DorleCo/devel/.private/rviz_carla_plugin/share/rviz_carla_plugin/cmake/rviz_carla_pluginConfig.cmake /home/sahil/DorleCo/devel/share/rviz_carla_plugin/cmake/rviz_carla_pluginConfig.cmake
-/home/sahil/DorleCo/devel/.private/rviz_carla_plugin/share/rviz_carla_plugin/cmake/rviz_carla_pluginConfig-version.cmake /home/sahil/DorleCo/devel/share/rviz_carla_plugin/cmake/rviz_carla_pluginConfig-version.cmake
-/home/sahil/DorleCo/devel/.private/rviz_carla_plugin/lib/librviz_carla_plugin.so /home/sahil/DorleCo/devel/lib/librviz_carla_plugin.so
-/home/sahil/DorleCo/devel/.private/rviz_carla_plugin/lib/pkgconfig/rviz_carla_plugin.pc /home/sahil/DorleCo/devel/lib/pkgconfig/rviz_carla_plugin.pc

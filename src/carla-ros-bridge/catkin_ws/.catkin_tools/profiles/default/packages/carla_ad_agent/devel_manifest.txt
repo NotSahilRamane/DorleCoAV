@@ -1,6 +1,0 @@
-ros-bridge/carla_ad_agent
-/home/sahil/carla-ros-bridge/catkin_ws/devel/.private/carla_ad_agent/cmake.lock /home/sahil/carla-ros-bridge/catkin_ws/devel/./cmake.lock
-/home/sahil/carla-ros-bridge/catkin_ws/devel/.private/carla_ad_agent/share/carla_ad_agent/cmake/carla_ad_agentConfig-version.cmake /home/sahil/carla-ros-bridge/catkin_ws/devel/share/carla_ad_agent/cmake/carla_ad_agentConfig-version.cmake
-/home/sahil/carla-ros-bridge/catkin_ws/devel/.private/carla_ad_agent/share/carla_ad_agent/cmake/carla_ad_agentConfig.cmake /home/sahil/carla-ros-bridge/catkin_ws/devel/share/carla_ad_agent/cmake/carla_ad_agentConfig.cmake
-/home/sahil/carla-ros-bridge/catkin_ws/devel/.private/carla_ad_agent/lib/pkgconfig/carla_ad_agent.pc /home/sahil/carla-ros-bridge/catkin_ws/devel/lib/pkgconfig/carla_ad_agent.pc
-/home/sahil/carla-ros-bridge/catkin_ws/devel/.private/carla_ad_agent/lib/python3/dist-packages/carla_ad_agent/__init__.py /home/sahil/carla-ros-bridge/catkin_ws/devel/lib/python3/dist-packages/carla_ad_agent/__init__.py

@@ -1,1 +1,0 @@
-/home/sahil/DorleCo/devel/.private/control_pid_stanley/lib/pkgconfig/control_pid_stanley.pc

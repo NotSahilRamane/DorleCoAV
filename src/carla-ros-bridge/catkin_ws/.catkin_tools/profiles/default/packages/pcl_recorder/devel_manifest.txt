@@ -1,6 +1,0 @@
-ros-bridge/pcl_recorder
-/home/sahil/carla-ros-bridge/catkin_ws/devel/.private/pcl_recorder/cmake.lock /home/sahil/carla-ros-bridge/catkin_ws/devel/./cmake.lock
-/home/sahil/carla-ros-bridge/catkin_ws/devel/.private/pcl_recorder/share/pcl_recorder/cmake/pcl_recorderConfig.cmake /home/sahil/carla-ros-bridge/catkin_ws/devel/share/pcl_recorder/cmake/pcl_recorderConfig.cmake
-/home/sahil/carla-ros-bridge/catkin_ws/devel/.private/pcl_recorder/share/pcl_recorder/cmake/pcl_recorderConfig-version.cmake /home/sahil/carla-ros-bridge/catkin_ws/devel/share/pcl_recorder/cmake/pcl_recorderConfig-version.cmake
-/home/sahil/carla-ros-bridge/catkin_ws/devel/.private/pcl_recorder/lib/pkgconfig/pcl_recorder.pc /home/sahil/carla-ros-bridge/catkin_ws/devel/lib/pkgconfig/pcl_recorder.pc
-/home/sahil/carla-ros-bridge/catkin_ws/devel/.private/pcl_recorder/lib/pcl_recorder/pcl_recorder_node /home/sahil/carla-ros-bridge/catkin_ws/devel/lib/pcl_recorder/pcl_recorder_node
