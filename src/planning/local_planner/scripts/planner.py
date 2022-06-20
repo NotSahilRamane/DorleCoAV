@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from threading import local
 import rospy
 
 import numpy as np
@@ -19,7 +18,7 @@ class LocalPlanner:
         rospy.loginfo("Subscribed to topics")
         rospy.Subscriber(self.global_plan_topic_name, globalPlan, buff_size=2**24, queue_size=1, callback=self.globalPlanCallback)
         rospy.Subscriber(self.current_state_topic_name, carState, callback=self.stateCallback)
-        rospy.Subscriber(self.slam_map_topic_name, OccupancyGrid, callback=self.slamCallback)
+        rospy.Subscriber(self.slam_map_topic_name, OccupancyGrid, buff_size=2**24, callback=self.slamCallback)
         rospy.Subscriber(self.behaviour_topic_name, behaviour, callback=self.behaviourCallback)
 
     def loadParameters(self):
