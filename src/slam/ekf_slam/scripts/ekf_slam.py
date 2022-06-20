@@ -7,7 +7,9 @@ import time
 
 from geometry_msgs.msg import TwistStamped, PolygonStamped, Point32
 from sensor_msgs.msg import Imu
-from av_messages.msg import objects, map
+from av_messages.msg import objects
+from nav_msgs.msg import OccupancyGrid
+
 
 import math
 
@@ -29,7 +31,7 @@ class EKFSlam:
     def publishToTopics(self):
         rospy.loginfo("Published to topics")
         self.MapPublisher = rospy.Publisher(
-            self.pub_topic_name, map, queue_size=1)
+            self.pub_topic_name, OccupancyGrid, queue_size=1)
 
     def slamCallback(self):
         '''
