@@ -1,8 +1,0 @@
-prefix=/home/sahil/DorleCo/install
-
-Name: control_pid_stanley
-Description: Description of control_pid_stanley
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

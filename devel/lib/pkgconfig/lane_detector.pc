@@ -1,1 +1,0 @@
-/home/sahil/DorleCo/devel/.private/lane_detector/lib/pkgconfig/lane_detector.pc

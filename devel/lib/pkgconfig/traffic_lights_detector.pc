@@ -1,1 +1,0 @@
-/home/sahil/DorleCo/devel/.private/traffic_lights_detector/lib/pkgconfig/traffic_lights_detector.pc

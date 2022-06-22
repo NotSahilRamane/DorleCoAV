@@ -1,5 +1,0 @@
-planning/local_planner
-/home/sahil/DorleCo/devel/.private/local_planner/cmake.lock /home/sahil/DorleCo/devel/./cmake.lock
-/home/sahil/DorleCo/devel/.private/local_planner/share/local_planner/cmake/local_plannerConfig.cmake /home/sahil/DorleCo/devel/share/local_planner/cmake/local_plannerConfig.cmake
-/home/sahil/DorleCo/devel/.private/local_planner/share/local_planner/cmake/local_plannerConfig-version.cmake /home/sahil/DorleCo/devel/share/local_planner/cmake/local_plannerConfig-version.cmake
-/home/sahil/DorleCo/devel/.private/local_planner/lib/pkgconfig/local_planner.pc /home/sahil/DorleCo/devel/lib/pkgconfig/local_planner.pc

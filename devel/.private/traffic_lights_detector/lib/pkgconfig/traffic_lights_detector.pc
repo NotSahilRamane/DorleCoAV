@@ -1,8 +1,0 @@
-prefix=/home/sahil/DorleCo/devel/.private/traffic_lights_detector
-
-Name: traffic_lights_detector
-Description: Description of traffic_lights_detector
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: std_msgs geometry_msgs nav_msgs sensor_msgs av_messages

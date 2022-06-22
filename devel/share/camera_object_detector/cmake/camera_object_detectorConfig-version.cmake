@@ -1,1 +1,0 @@
-/home/sahil/DorleCo/devel/.private/camera_object_detector/share/camera_object_detector/cmake/camera_object_detectorConfig-version.cmake

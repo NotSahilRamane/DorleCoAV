@@ -1,8 +1,0 @@
-prefix=/home/sahil/DorleCo/install
-
-Name: pseudo_structure
-Description: Description of pseudo_structure
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

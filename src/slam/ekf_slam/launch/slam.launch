@@ -1,0 +1,4 @@
+<launch>
+    <node name="ekf_slam" pkg="ekf_slam" type="main.py" output="screen">
+    </node>
+</launch>

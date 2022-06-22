@@ -1,5 +1,0 @@
-controls/pseudo_structure
-/home/sahil/DorleCo/devel/.private/pseudo_structure/cmake.lock /home/sahil/DorleCo/devel/./cmake.lock
-/home/sahil/DorleCo/devel/.private/pseudo_structure/share/pseudo_structure/cmake/pseudo_structureConfig.cmake /home/sahil/DorleCo/devel/share/pseudo_structure/cmake/pseudo_structureConfig.cmake
-/home/sahil/DorleCo/devel/.private/pseudo_structure/share/pseudo_structure/cmake/pseudo_structureConfig-version.cmake /home/sahil/DorleCo/devel/share/pseudo_structure/cmake/pseudo_structureConfig-version.cmake
-/home/sahil/DorleCo/devel/.private/pseudo_structure/lib/pkgconfig/pseudo_structure.pc /home/sahil/DorleCo/devel/lib/pkgconfig/pseudo_structure.pc

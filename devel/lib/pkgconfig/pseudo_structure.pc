@@ -1,1 +1,0 @@
-/home/sahil/DorleCo/devel/.private/pseudo_structure/lib/pkgconfig/pseudo_structure.pc

@@ -1,8 +1,0 @@
-prefix=/home/sahil/DorleCo/install
-
-Name: stereo_depth
-Description: Description of stereo_depth
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: std_msgs geometry_msgs nav_msgs sensor_msgs av_messages

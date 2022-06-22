@@ -1,8 +1,0 @@
-prefix=/home/sahil/DorleCo/install
-
-Name: behaviour_planner
-Description: Description of behaviour_planner
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

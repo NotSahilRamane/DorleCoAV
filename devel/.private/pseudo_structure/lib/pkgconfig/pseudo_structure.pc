@@ -1,8 +1,0 @@
-prefix=/home/sahil/DorleCo/devel/.private/pseudo_structure
-
-Name: pseudo_structure
-Description: Description of pseudo_structure
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

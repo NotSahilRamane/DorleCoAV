@@ -1,5 +1,0 @@
-perception/road_segmentation
-/home/sahil/DorleCo/devel/.private/road_segmentation/cmake.lock /home/sahil/DorleCo/devel/./cmake.lock
-/home/sahil/DorleCo/devel/.private/road_segmentation/share/road_segmentation/cmake/road_segmentationConfig-version.cmake /home/sahil/DorleCo/devel/share/road_segmentation/cmake/road_segmentationConfig-version.cmake
-/home/sahil/DorleCo/devel/.private/road_segmentation/share/road_segmentation/cmake/road_segmentationConfig.cmake /home/sahil/DorleCo/devel/share/road_segmentation/cmake/road_segmentationConfig.cmake
-/home/sahil/DorleCo/devel/.private/road_segmentation/lib/pkgconfig/road_segmentation.pc /home/sahil/DorleCo/devel/lib/pkgconfig/road_segmentation.pc

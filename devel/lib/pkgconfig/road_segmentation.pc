@@ -1,1 +1,0 @@
-/home/sahil/DorleCo/devel/.private/road_segmentation/lib/pkgconfig/road_segmentation.pc
