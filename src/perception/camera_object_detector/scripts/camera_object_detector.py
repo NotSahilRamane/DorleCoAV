@@ -54,7 +54,7 @@ class Detector:
         and the final publish function (To be done by sahil)
         '''
         yolo = yolov5.YOLO_Fast()
-        boxes, scores, classes, num_dets = yolo.object_detection(self.rgb_image)
+        boxes, scores, classes, num_dets, image_with_bboxes = yolo.object_detection(self.rgb_image)
 
     def callPublisher(self):
         '''

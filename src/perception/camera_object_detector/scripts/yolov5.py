@@ -189,35 +189,37 @@ class YOLO_Fast(): # outputs tlbr bounding boxes
         self.classes_scores = np.array(self.classes_scores)[pick]
         self.picks = pick 
     
-    # def drawNMSBoxes(self):
-    #     self.boxes = self.tlwh2tlbr()
-    #     for box, pick, classId in zip(self.boxes, self.picks, self.class_ids):
-    #         label = '%.2f' % (self.confidences[pick])
-    #         if len(self.class_ids)>0:
-    #             assert(classId < len(self.classes))
-    #             labeltoDraw = '%s:%s' % (self.classes[classId], label)
-    # #       box = boxes[i]
-    #         left = box[0]
-    #         top = box[1]
-    #         right = box[2]
-    #         bottom = box[3]
-    #         cv2.rectangle(self.image, (left, top), (right, bottom), self.BLUE, 3*self.THICKNESS)
+    def drawNMSBoxes(self):
+        copy = cv2.copy(self.image)
+        self.boxes = self.tlwh2tlbr()
+        for box, pick, classId in zip(self.boxes, self.picks, self.class_ids):
+            label = '%.2f' % (self.confidences[pick])
+            if len(self.class_ids)>0:
+                assert(classId < len(self.classes))
+                labeltoDraw = '%s:%s' % (self.classes[classId], label)
+    #       box = boxes[i]
+            left = box[0]
+            top = box[1]
+            right = box[2]
+            bottom = box[3]
+            cv2.rectangle(copy (left, top), (right, bottom), self.BLUE, 3*self.THICKNESS)
 
-    #         #Display the label at the top of the bounding box
-    #         labelSize, baseLine = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
-    #         top = max(top, labelSize[1])
-    #         cv2.putText(self.image, labeltoDraw, (left, top), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), thickness=1)
+            #Display the label at the top of the bounding box
+            labelSize, baseLine = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
+            top = max(top, labelSize[1])
+            cv2.putText(copy, labeltoDraw, (left, top), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), thickness=1)
             
-    #         # Put efficiency information. The function getPerfProfile returns the overall time for inference(t) and the timings for each of the layers(in layersTimes)
-    #         t, _ = self.net.getPerfProfile()
-    #         label = 'Inference time: %.2f ms' % (t * 1000.0 / cv2.getTickFrequency())
-    #         cv2.putText(self.image, label, (20, 40), self.FONT_FACE, self.FONT_SCALE, self.YELLOW, 1, cv2.LINE_AA)    
+            # Put efficiency information. The function getPerfProfile returns the overall time for inference(t) and the timings for each of the layers(in layersTimes)
+            t, _ = self.net.getPerfProfile()
+            label = 'Inference time: %.2f ms' % (t * 1000.0 / cv2.getTickFrequency())
+            cv2.putText(copy, label, (20, 40), self.FONT_FACE, self.FONT_SCALE, self.YELLOW, 1, cv2.LINE_AA)    
+        return copy
         
-    def object_detection(self, input_image):
+    def object_detection(self, input_image, visualise=False):
         self.pre_process(input_image)
         self.post_process()      
         self.non_max_suppression_fast()
-        # if visualise == True:
-        #     self.drawNMSBoxes()
+        if visualise == True:
+            image_with_bboxes = self.drawNMSBoxes()
 
-        return self.boxes, np.array([self.classes_scores]), np.array([self.class_ids]), len(self.class_ids)
+        return self.boxes, np.array([self.classes_scores]), np.array([self.class_ids]), len(self.class_ids), image_with_bboxes
