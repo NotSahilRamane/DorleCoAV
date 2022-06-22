@@ -18,8 +18,8 @@ class Detector:
         self.bridge = CvBridge()
         self.rgb_image = None
         self.depth_image = None
+        self.yolo = yolov5.YOLO_Fast()
         
-
     def subscribeToTopics(self):
         rospy.loginfo("Subscribed to topics")
         rospy.Subscriber(self.image_topicname, depthandimage,
@@ -53,8 +53,7 @@ class Detector:
         Call yolo related functions here (Reuben, Mayur)
         and the final publish function (To be done by sahil)
         '''
-        yolo = yolov5.YOLO_Fast()
-        boxes, scores, classes, num_dets, image_with_bboxes = yolo.object_detection(self.rgb_image)
+        boxes, scores, classes, num_dets, image_with_bboxes = self.yolo.object_detection(self.rgb_image)
 
     def callPublisher(self):
         '''
