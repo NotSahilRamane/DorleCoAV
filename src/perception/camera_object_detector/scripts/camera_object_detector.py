@@ -2,10 +2,12 @@
 
 import cv2
 import rospy
+import yolov5
 
 from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import Image
 from av_messages.msg import depthandimage, object, objects
+
 
 import numpy as np
 import math
@@ -51,6 +53,8 @@ class Detector:
         Call yolo related functions here (Reuben, Mayur)
         and the final publish function (To be done by sahil)
         '''
+        yolo = yolov5.YOLO_Fast()
+        boxes, scores, classes, num_dets = yolo.object_detection(self.rgb_image)
 
     def callPublisher(self):
         '''
