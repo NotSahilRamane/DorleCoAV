@@ -144,6 +144,7 @@ class Stanley():
         for obj in self.waypoints_list:
             self.cx.append(obj.pose.position.x)
             self.cy.append(obj.pose.position.y)
+            self.cyaw.append(obj.pose.orientation.z)
 
     def odometryCallback(self, data):
         self.state.x = data.pose.pose.position.x
@@ -172,8 +173,8 @@ class Stanley():
             if (acc < 0):
                 control_command.throttle = 0
                 control_command.brake = -acc
-            elif (a >= 1):
-                a = 1
+            elif (acc >= 1):
+                acc = 1
                 control_command.throttle = acc
                 control_command.brake = 0
             
