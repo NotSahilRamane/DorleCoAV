@@ -9,8 +9,9 @@ def main():
     controller.subscribeToTopics()
     controller.publishToTopics()
     while not rospy.is_shutdown():
-        if controller.waypoints_list:
-            controller.callController()
+        if controller.state != None:
+            if controller.waypoints_list:
+                controller.callController()
 
 
 if __name__ == u'__main__':
