@@ -200,3 +200,30 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+find_package(catkin REQUIRED COMPONENTS
+  std_msgs
+  roscpp
+  rospy
+  sensor_msgs
+  geometry_msgs
+  nav_msgs
+  )
+
+set(PROJECT_DEPS
+  rospy
+  std_msgs
+  sensor_msgs
+  geometry_msgs
+  nav_msgs
+  )
+
+catkin_package(
+  CATKIN_DEPENDS std_msgs geometry_msgs nav_msgs sensor_msgs # Needed to generate custom messages
+)
+
+include_directories(
+  # include
+  ${catkin_INCLUDE_DIRS}
+  ${roscpp_INCLUDE_DIRS}
+  ${rospy_INCLUDE_DIRS}
+)
