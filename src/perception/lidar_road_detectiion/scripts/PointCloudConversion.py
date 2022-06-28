@@ -74,9 +74,10 @@ def convertCloudFromRosToOpen3d(ros_cloud):
     # Get cloud data from ros_cloud
     field_names=[field.name for field in ros_cloud.fields]
     cloud_data = list(pc2.read_points(ros_cloud, skip_nans=True, field_names = field_names))
+    # print(cloud_data[0])
 
     # Check empty
-    open3d_cloud = open3d.PointCloud()
+    open3d_cloud = open3d.geometry.PointCloud()
     if len(cloud_data)==0:
         print("Converting an empty cloud")
         return None
@@ -99,8 +100,8 @@ def convertCloudFromRosToOpen3d(ros_cloud):
         open3d_cloud.points = open3d.Vector3dVector(np.array(xyz))
         open3d_cloud.colors = open3d.Vector3dVector(np.array(rgb)/255.0)
     else:
-        xyz = [(x,y,z) for x,y,z in cloud_data ] # get xyz
-        open3d_cloud.points = open3d.Vector3dVector(np.array(xyz))
+        xyz = [(x,y,z) for x,y,z,i in cloud_data ] # get xyz
+        open3d_cloud.points = open3d.utility.Vector3dVector(np.array(xyz))
 
     # return
     return open3d_cloud
