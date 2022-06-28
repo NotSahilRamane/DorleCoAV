@@ -34,7 +34,7 @@ class Stanley():
         self.k = 0.015
         self.Kp = 1.0
         self.L = 2.8
-        self.max_steer = 1.221730351448059
+        self.max_steer = 0.523599
         # self.state = State()
         self.last_used_idx = 0
         self.i = 0
@@ -122,19 +122,26 @@ class Stanley():
 
 
         d = np.hypot(dx, dy)
+        
         target_idx = np.argmin(d)
-        last_index = target_idx -1
-        x1 = cx[last_index]
-        x2 = cx[target_idx]
-        y1 = cy[last_index]
-        y2 = cy[target_idx]
+        # i = target_idx
+        # while d[i] < 7:
+        #     i+=1
+            
+    
+        x1 = state.x
+        x2 = cx[target_idx + 5]
+        y1 = state.y
+        y2 = cy[target_idx + 5]
 
         a = y1 -y2
         b = x2 - x1
         c = x1*(y2 - y1) - y1*(x2-x1)
         # c = 0.5
-
-        d_theta = np.arctan(-a/b)
+        if a == 0 or b ==0:
+            d_theta = 0
+        else:
+            d_theta = np.arctan(-a/b)
         error_front_axle = a*fx + b*fy + c / math.sqrt(a**2 + b**2)
 
         # print("Target IDX: ", target_idx)
@@ -147,7 +154,7 @@ class Stanley():
         # print(front_axle_vec, "Front axle vel")                
         # error_front_axle = np.dot([abs(dx[target_idx]), abs(dy[target_idx])], front_axle_vec)
         # print(error_front_axle, "Error front")
-        return target_idx, error_front_axle, d_theta
+        return target_idx + 5, error_front_axle, d_theta
 
     def subscribeToTopics(self):
         rospy.loginfo("Subscribed to topics")
@@ -191,8 +198,9 @@ class Stanley():
         if last_idx > target_idx:
             acc = self.pid_control(target_speed, self.state.v)
             steer, target_idx = self.stanley_control(self.state, self.cx, self.cy, self.cyaw, target_idx)
-            # print("initial steer", steer)
+            print("initial steer", steer)
             steer = np.clip(steer, -self.max_steer, self.max_steer)
+            steer = ((steer - (-self.max_steer)) / (self.max_steer - (-self.max_steer))) * (1 - (-1)) + (-1)
             self.x.append(self.state.x)
             self.y.append(self.state.y)
             self.yaw.append(self.state.yaw)
@@ -200,7 +208,7 @@ class Stanley():
 
             control_command = CarlaEgoVehicleControl()
             # control_command.header.stamp = rospy.get_time()
-            control_command.steer = steer
+            control_command.steer = steer+-1
             if (acc < 0):
                 control_command.throttle = 0
                 control_command.brake = -acc
@@ -209,8 +217,8 @@ class Stanley():
                 control_command.throttle = acc
                 control_command.brake = 0
 
-            # print(acc, steer)
-            # print("Throttle, steer")
+            print(acc, steer)
+            print("Throttle, steer")
 
             control_command.hand_brake = False
             control_command.reverse = False
