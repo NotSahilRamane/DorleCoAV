@@ -12,7 +12,7 @@ client_id = f'python-mqtt-{random.randint(0, 1000)}'
 # password = 'public'
 
 root = tk.Tk()
-cloent = None
+client = None
 
 def connect_mqtt():
     global username, password
@@ -68,7 +68,6 @@ class Example(tk.Frame):
 
 
 if __name__ == "__main__":
-    global client
     client = connect_mqtt()
     client.loop_start()
 
