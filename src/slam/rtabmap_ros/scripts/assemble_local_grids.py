@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Similar to map_assembler node, this minimal python example shows how
 # to reconstruct the obstacle map by subscribing only to
