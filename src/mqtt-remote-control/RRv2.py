@@ -28,7 +28,7 @@ def connect_mqtt() -> mqtt_client:
             print("Failed to connect, return code %d\n", rc)
 
     client = mqtt_client.Client(client_id)
-    # client.username_pw_set(username, password)
+    # client.username_pw_set(username, password) 
     client.on_connect = on_connect
     client.connect(broker, port)
     return client
@@ -37,13 +37,11 @@ def connect_mqtt() -> mqtt_client:
 def subscribe(client: mqtt_client):
     def on_message(client, userdata, msg):
         control_command = CarlaEgoVehicleControl()
-        # global controlcommandPub
+        global controlcommandPub
         m_decode=str(msg.payload.decode())
-        # print(m_decode)
+        
         m_separated = m_decode.split(";")
-        # print(m_separated)
         if m_separated[0] == "CheckFlag":
-            print(type(m_separated[1]))
             control_command.throttle = float(m_separated[1])
             control_command.reverse = True if m_separated[2] is "True" else False
             control_command.brake = float(m_separated[3])
