@@ -43,12 +43,13 @@ def subscribe(client: mqtt_client):
         m_separated = m_decode.split(";")
         if m_separated[0] == "CheckFlag":
             control_command.throttle = float(m_separated[1])
-            control_command.reverse = True if m_separated[2] is "True" else False
+            control_command.reverse = True if m_separated[2] == "True" else False
             control_command.brake = float(m_separated[3])
             control_command.steer = float(m_separated[4])
-            control_command.hand_brake = True if m_separated[5] is "True" else False
+            control_command.hand_brake = True if m_separated[5] == "True" else False
             control_command.manual_gear_shift = False
             controlcommandPub.publish(control_command)
+        
 
     client.subscribe(topic)
     client.on_message = on_message

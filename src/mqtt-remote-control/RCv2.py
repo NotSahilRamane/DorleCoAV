@@ -17,7 +17,6 @@ import rospy
 # from carla_msgs.msg import CarlaEgoVehicleControl
 import rospy
 from paho.mqtt import client as mqtt_client
-import json
 import random
 from time import sleep
 
@@ -115,7 +114,7 @@ class KeyboardControl(object):
             msg = msg + "0.0;"
 
         # KEYS S & A || STEERING
-        steer_increment = 5e-4 * milliseconds
+        steer_increment = 6e-4 * milliseconds
         
         if keys[K_a] == True:
             self._steer_cache -= steer_increment
@@ -130,6 +129,7 @@ class KeyboardControl(object):
         # KEYS SPACE || HANDBRAKE
         msg = msg + str(bool(keys[K_SPACE]))
         publish(client, msg)
+        sleep(0.02)
    
 client = connect_mqtt()
 client.loop_start()
