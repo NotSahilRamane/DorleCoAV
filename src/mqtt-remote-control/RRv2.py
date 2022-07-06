@@ -4,7 +4,7 @@ import random
 import rospy
 from paho.mqtt import client as mqtt_client
 from carla_msgs.msg import CarlaEgoVehicleControl
-import json
+
 
 # broker = 'broker.emqx.io'
 # port = 1883
@@ -36,15 +36,21 @@ def connect_mqtt() -> mqtt_client:
 
 def subscribe(client: mqtt_client):
     def on_message(client, userdata, msg):
-        global controlcommandPub
+        control_command = CarlaEgoVehicleControl()
+        # global controlcommandPub
         m_decode=str(msg.payload.decode())
-        control_command = json.loads(m_decode)
-        print(type(control_command))
-        print(control_command)
-        
-        # controlcommandPub.publish(control_command)
-        
-
+        # print(m_decode)
+        m_separated = m_decode.split(";")
+        # print(m_separated)
+        if m_separated[0] == "CheckFlag":
+            print(type(m_separated[1]))
+            control_command.throttle = float(m_separated[1])
+            control_command.reverse = True if m_separated[2] is "True" else False
+            control_command.brake = float(m_separated[3])
+            control_command.steer = float(m_separated[4])
+            control_command.hand_brake = True if m_separated[5] is "True" else False
+            control_command.manual_gear_shift = False
+            controlcommandPub.publish(control_command)
 
     client.subscribe(topic)
     client.on_message = on_message

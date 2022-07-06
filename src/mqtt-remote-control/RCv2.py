@@ -14,11 +14,12 @@ except ImportError:
     raise RuntimeError('cannot import pygame, make sure pygame package is installed')
 
 import rospy
-from carla_msgs.msg import CarlaEgoVehicleControl
+# from carla_msgs.msg import CarlaEgoVehicleControl
 import rospy
 from paho.mqtt import client as mqtt_client
 import json
 import random
+from time import sleep
 
 broker = 'broker.hivemq.com'
 port = 1883
@@ -63,15 +64,15 @@ class KeyboardControl(object):
     Handle input events
     """
 
-    def __init__(self,):
+    def __init__(self):
 
         self._autopilot_enabled = False
-        self._control = CarlaEgoVehicleControl()
+        # self._control = CarlaEgoVehicleControl()
         self._steer_cache = 0.0
 
     
-        self.vehicle_control_publisher = rospy.Publisher(
-            "/carla/ego_vehicle/vehicle_control_cmd", CarlaEgoVehicleControl, queue_size=1)
+        # self.vehicle_control_publisher = rospy.Publisher(
+        #     "/carla/ego_vehicle/vehicle_control_cmd", CarlaEgoVehicleControl, queue_size=1)
 
     # pylint: disable=too-many-branches
     def parse_events(self, clock):
@@ -81,11 +82,11 @@ class KeyboardControl(object):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return True
-            elif event.type == pygame.KEYUP:
-                if event.key == K_q:
-                    self._control.gear = 1 if self._control.reverse else -1
+            # elif event.type == pygame.KEYUP:
+                # if event.key == K_q:
+                    # self._control.gear = 1 if self._control.reverse else -1
 
-        
+        # print(clock.get_time())
         self._parse_vehicle_keys(pygame.key.get_pressed(), clock.get_time())
 
     def _parse_vehicle_keys(self, keys, milliseconds):
@@ -93,29 +94,50 @@ class KeyboardControl(object):
         parse key events
         """
         global publish, client
-        self._control.throttle = 0.5 if keys[K_UP] or keys[K_w] else 0.0
+
+        msg = "CheckFlag;"
+        # KEY W || THROTTLE
+        if keys[K_w] == True:
+            msg = msg + str(0.5) +";"
+        elif keys[K_w] == False:
+            msg = msg + str(0.0) + ";"
+
+        # KEY Q || REVERSE FLAG
+        if keys[K_q] == True:
+            msg = msg + "True;"
+        elif keys[K_q] == False:
+            msg = msg + "False;"
+
+        # KEY S || BRAKE FLAG
+        if keys[K_s] == True:
+            msg = msg + "1.0;"
+        elif keys[K_s] == False:
+            msg = msg + "0.0;"
+
+        # KEYS S & A || STEERING
         steer_increment = 5e-4 * milliseconds
-        if keys[K_LEFT] or keys[K_a]:
+        
+        if keys[K_a] == True:
             self._steer_cache -= steer_increment
-        elif keys[K_RIGHT] or keys[K_d]:
+        elif keys[K_d] == True:
             self._steer_cache += steer_increment
         else:
             self._steer_cache = 0.0
-        self._steer_cache = min(0.7, max(-0.7, self._steer_cache))
-        self._control.steer = round(self._steer_cache, 1)
-        self._control.brake = 1.0 if keys[K_DOWN] or keys[K_s] else 0.0
-        self._control.hand_brake = bool(keys[K_SPACE])
-        data_out = json.dumps(self._control)
-        publish(client, data_out)
-
-
-
         
+        self._steer_cache = min(0.7, max(-0.7, self._steer_cache))
+        msg = msg + str(self._steer_cache) + ";"
+
+        # KEYS SPACE || HANDBRAKE
+        msg = msg + str(bool(keys[K_SPACE]))
+        publish(client, msg)
+   
 client = connect_mqtt()
 client.loop_start()
-clock = pygame.time.Clock()
 
 getConrol = KeyboardControl()
 
-while running:
-    KeyboardControl.parse_events(clock)
+while True:
+    clock = pygame.time.Clock()
+    clock.tick(60)
+
+    getConrol.parse_events(clock=clock)
