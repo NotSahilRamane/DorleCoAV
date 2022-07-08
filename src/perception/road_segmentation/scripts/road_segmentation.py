@@ -7,6 +7,8 @@ from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import Image
 from av_messages.msg import depthandimage
 
+from YOLOP.tools import YOLO_P
+
 import numpy as np
 import math
 
@@ -16,10 +18,16 @@ class Detector:
         self.bridge = CvBridge()
         self.rgb_image = None
         self.depth_image = None
+        self.yolo_p = YOLO_P()
         
+    # def subscribeToTopics(self):
+    #     rospy.loginfo("Subscribed to topics")
+    #     rospy.Subscriber(self.image_topicname, depthandimage,
+    #                      self.storeImage, queue_size=1)
+
     def subscribeToTopics(self):
         rospy.loginfo("Subscribed to topics")
-        rospy.Subscriber(self.image_topicname, depthandimage,
+        rospy.Subscriber(self.image_topicname, Image,
                          self.storeImage, queue_size=1)
 
     def loadParameters(self):
@@ -27,7 +35,7 @@ class Detector:
         do something
         '''
         self.image_topicname = rospy.get_param(
-            "traffic_lights_detector/image_topic_name", "/camera/imagedata")
+            "camera_object_detector/image_topic_name", "/carla/ego_vehicle/rgb_view/image")
         self.pub_topic_name = rospy.get_param(
             "lane_detector/road_segmentation_topic_name", "/camera/roadsegmentation")
     
@@ -38,8 +46,8 @@ class Detector:
 
     def storeImage(self, img):
         try:
-            self.rgb_image = self.bridge.imgmsg_to_cv2(img.rgb_image, 'bgr8')
-            self.depth_image = self.bridge.imgmsg_to_cv2(img.depth_image, "32FC1") ## Confirm these once
+            self.rgb_image = self.bridge.imgmsg_to_cv2(img, 'bgr8')
+            # self.depth_image = self.bridge.imgmsg_to_cv2(img.depth_image, "32FC1") ## Confirm these once
             self.callDetector()
         except CvBridgeError as e:
             rospy.loginfo(str(e))
@@ -49,8 +57,12 @@ class Detector:
         Call the segmentation model related functions here (Reuben, Mayur)
         and the final publish function (To be done by sahil)
         '''
+        img_det, _, _ = self.yolo_p.detect(self.rgb_image)
+        self.callPublisher(img_det)
 
     def callPublisher(self):
         '''
         the final publisher function
         '''
+        segmented_image = self.bridge.cv2_to_image()
+        self.DetectionsPublisher.publish(segmented_image)

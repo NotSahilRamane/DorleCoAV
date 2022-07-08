@@ -4,7 +4,7 @@ import numpy as np
 class YOLO_Fast(): # outputs tlbr bounding boxes
     # Constructor
     # We create  a constructor that takes in score, confidence and nms thresholds, along with which model to use. 
-    def __init__(self, sc_thresh=.5, nms_thresh=.45, cnf_thresh=.45, model="./src/perception/camera_object_detector/req_files/onnx_models/yolov5s.onnx"):
+    def __init__(self, sc_thresh=.5, nms_thresh=.45, cnf_thresh=.45, model="/home/reuben/perception_modules/src/perception/camera_object_detector/scripts/req_files/onnx_models/yolov5s.onnx"):
         # Our model (YOLOv5) architecture expects a 640px by 640px image as input
         self.INPUT_WIDTH = 640
         self.INPUT_HEIGHT = 640
@@ -14,18 +14,18 @@ class YOLO_Fast(): # outputs tlbr bounding boxes
         self.NMS_THRESHOLD = nms_thresh
         self.CONFIDENCE_THRESHOLD = cnf_thresh
         
-        # # Drawing labels and rectangles
-        # self.FONT_FACE = cv2.FONT_HERSHEY_SIMPLEX
-        # self.FONT_SCALE = 0.7
-        # self.THICKNESS = 1
+        # Drawing labels and rectangles
+        self.FONT_FACE = cv2.FONT_HERSHEY_SIMPLEX
+        self.FONT_SCALE = 0.7
+        self.THICKNESS = 1
         
-        # # Colors
-        # self.BLACK = (0, 0, 0)
-        # self.BLUE = (255, 178, 50)
-        # self.YELLOW = (0, 255, 255)
+        # Colors
+        self.BLACK = (0, 0, 0)
+        self.BLUE = (255, 178, 50)
+        self.YELLOW = (0, 255, 255)
         
         # Network & Classes
-        classesFile = "./src/perception/camera_object_detector/req_files/coco_classes.txt"
+        classesFile = "/home/reuben/perception_modules/src/perception/camera_object_detector/scripts/req_files/coco_classes.txt"
         self.classes = None
         # A handy way to read all the classes from a file, without needing to hardcode each one
         with open(classesFile, 'rt') as f:
@@ -190,7 +190,7 @@ class YOLO_Fast(): # outputs tlbr bounding boxes
         self.picks = pick 
     
     def drawNMSBoxes(self):
-        copy = cv2.copy(self.image)
+        copy = np.copy(self.image)
         self.boxes = self.tlwh2tlbr()
         for box, pick, classId in zip(self.boxes, self.picks, self.class_ids):
             label = '%.2f' % (self.confidences[pick])
@@ -202,9 +202,9 @@ class YOLO_Fast(): # outputs tlbr bounding boxes
             top = box[1]
             right = box[2]
             bottom = box[3]
-            cv2.rectangle(copy (left, top), (right, bottom), self.BLUE, 3*self.THICKNESS)
+            cv2.rectangle(copy, (left, top), (right, bottom), self.BLUE, 3*self.THICKNESS)
 
-            #Display the label at the top of the bounding box
+            # Display the label at the top of the bounding box
             labelSize, baseLine = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
             top = max(top, labelSize[1])
             cv2.putText(copy, labeltoDraw, (left, top), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), thickness=1)
@@ -217,9 +217,11 @@ class YOLO_Fast(): # outputs tlbr bounding boxes
         
     def object_detection(self, input_image, visualise=False):
         self.pre_process(input_image)
-        self.post_process()      
-        self.non_max_suppression_fast()
-        if visualise == True:
+        self.post_process()  
+        self.non_max_suppression_fast()    
+        if visualise == True and hasattr(self, 'picks'):
             image_with_bboxes = self.drawNMSBoxes()
+        else:
+            image_with_bboxes = input_image
 
         return self.boxes, np.array([self.classes_scores]), np.array([self.class_ids]), len(self.class_ids), image_with_bboxes

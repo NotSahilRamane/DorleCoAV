@@ -7,4 +7,7 @@ src/carla-ros-bridge/catkin_ws/logs/
 src/carla-ros-bridge/catkin_ws/.catkin_tools/
 src/carla-ros-bridge/catkin_ws/src/ros-bridge/.pylintrc
 .catkin_tools/
-
+src/perception/camera_object_detector/scripts/__pycache__/
+*.avi
+*.jpg
+*.pyc

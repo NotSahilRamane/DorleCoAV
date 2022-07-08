@@ -6,7 +6,7 @@ import yolov5
 
 from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import Image
-from av_messages.msg import depthandimage, object, objects
+# from av_messages.msg import depthandimage, object, objects
 
 
 import numpy as np
@@ -20,9 +20,14 @@ class Detector:
         self.depth_image = None
         self.yolo = yolov5.YOLO_Fast()
         
+    # def subscribeToTopics(self):
+    #     rospy.loginfo("Subscribed to topics")
+    #     rospy.Subscriber(self.image_topicname, depthandimage,
+    #                      self.storeImage, queue_size=1)
+
     def subscribeToTopics(self):
         rospy.loginfo("Subscribed to topics")
-        rospy.Subscriber(self.image_topicname, depthandimage,
+        rospy.Subscriber(self.image_topicname, Image,
                          self.storeImage, queue_size=1)
 
     def loadParameters(self):
@@ -30,20 +35,24 @@ class Detector:
         do something
         '''
         self.image_topicname = rospy.get_param(
-            "camera_object_detector/image_topic_name", "/camera/imagedata")
+            "camera_object_detector/image_topic_name", "/carla/ego_vehicle/rgb_view/image")
         self.pub_topic_name = rospy.get_param(
             "camera_object_detector/object_detections_topic_name", "/camera/objectdetections")
     
+    # def publishToTopics(self):
+    #     rospy.loginfo("Published to topics")
+    #     self.DetectionsPublisher = rospy.Publisher(
+    #         self.pub_topic_name, objects, queue_size=1)
 
     def publishToTopics(self):
         rospy.loginfo("Published to topics")
         self.DetectionsPublisher = rospy.Publisher(
-            self.pub_topic_name, objects, queue_size=1)
+            self.pub_topic_name, Image, queue_size=1)
 
     def storeImage(self, img):
         try:
-            self.rgb_image = self.bridge.imgmsg_to_cv2(img.rgb_image, 'bgr8')
-            self.depth_image = self.bridge.imgmsg_to_cv2(img.depth_image, "32FC1") ## Confirm these once
+            self.rgb_image = self.bridge.imgmsg_to_cv2(img, 'bgr8')
+            # self.depth_image = self.bridge.imgmsg_to_cv2(img.depth_image, "32FC1") ## Confirm these once
             self.callYOLO()
         except CvBridgeError as e:
             rospy.loginfo(str(e))
@@ -53,11 +62,17 @@ class Detector:
         Call yolo related functions here (Reuben, Mayur)
         and the final publish function (To be done by sahil)
         '''
-        boxes, scores, classes, num_dets, image_with_bboxes = self.yolo.object_detection(self.rgb_image)
+        boxes, scores, classes, num_dets, image_with_bboxes = self.yolo.object_detection(self.rgb_image, visualise=True)
+        # print(image_with_bboxes)
+        self.callPublisher(image_with_bboxes)
 
-    def callPublisher(self):
+    def callPublisher(self, img):
         '''
         the final publisher function
         '''
+
+        image_data = self.bridge.cv2_to_imgmsg(img, 'bgr8')
+        self.DetectionsPublisher.publish(image_data)
+
 
         
