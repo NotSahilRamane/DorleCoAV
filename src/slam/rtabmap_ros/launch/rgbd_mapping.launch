@@ -37,7 +37,7 @@
   
   <arg name="visual_odometry"         default="false"/>          <!-- Generate visual odometry -->
   <arg name="odom_topic"              default="/carla/ego_vehicle/odometry"/>         <!-- Odometry topic used if visual_odometry is false -->
-  <arg name="odom_frame_id"           default="map"/>              <!-- If set, TF is used to get odometry instead of the topic -->
+  <arg name="odom_frame_id"           default="ego_vehicle"/>              <!-- If set, TF is used to get odometry instead of the topic -->
    
   <arg name="namespace"               default="rtabmap"/>
   <arg name="wait_for_transform"      default="0.2"/>
