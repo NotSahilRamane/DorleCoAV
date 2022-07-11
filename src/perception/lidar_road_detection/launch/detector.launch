@@ -1,4 +1,0 @@
-<launch>
-    <node name="lidar_road_detectiion" pkg="lidar_road_detectiion" type="main.py" output="screen">
-    </node>
-</launch>

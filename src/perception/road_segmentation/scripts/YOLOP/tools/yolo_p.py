@@ -11,7 +11,7 @@ sys.path.append(BASE_DIR)
 # print(sys.path)
 import cv2
 import torch
-# import torch.backends.cudnn as cudnn
+import torch.backends.cudnn as cudnn
 from numpy import random
 # import scipy.special
 # import numpy as np

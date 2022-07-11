@@ -1,6 +1,10 @@
 build/
 devel/
 logs/
+src/perception/grid_map/
+src/perception/lidar_road_detection/
+src/perception/depthai-ros/  # learn to fix this... make git status stop showing the deleted files
+src/perception/grid_map/
 src/carla-ros-bridge/catkin_ws/build/
 src/carla-ros-bridge/catkin_ws/devel/
 src/carla-ros-bridge/catkin_ws/logs/
