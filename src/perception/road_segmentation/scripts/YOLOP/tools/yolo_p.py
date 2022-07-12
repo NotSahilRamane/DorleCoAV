@@ -112,21 +112,13 @@ class YOLOP_Class:
 
 #     vid_path = 'src/perception/road_segmentation/scripts/YOLOP/inference/rgb_streams/video_output.mp4'
 #     cap = cv2.VideoCapture(vid_path)
-
-#     # fps = cap.get(cv2.CAP_PROP_FPS)
-#     # size = (int(cap.get(4)), int(cap.get(3)))
-#     # result = cv2.VideoWriter('out.avi', 
-#     #                      cv2.VideoWriter_fourcc(*'MJPG'),
-#     #                      fps, size)
-
-#     yolo_p = YOLOP()
+#     yolo_p = YOLOP_Class()
 #     with torch.no_grad():
 #         while cap.isOpened():
 #             ret, frame = cap.read()
 #             if ret:
 #                 det_frame, _, _ = yolo_p.detect(frame)
 #                 cv2.imshow("Output", det_frame)
-#                 # result.write(det_frame)
 #                 key = cv2.waitKey(1) & 0xFF
 #                 if key == ord("q"):
 #                     break
@@ -134,7 +126,6 @@ class YOLOP_Class:
 #                 break
 
 # cv2.destroyAllWindows()
-# # result.release()
 # cap.release()
 
 

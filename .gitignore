@@ -15,3 +15,4 @@ src/perception/camera_object_detector/scripts/__pycache__/
 *.avi
 *.jpg
 *.pyc
+.vscode/
