@@ -19,7 +19,7 @@ def check_anchor_order(m):
         m.anchor_grid[:] = m.anchor_grid.flip(0)
 
 
-def run_anchor(logger,dataset, model, thr=4.0, imgsz=640):
+def run_anchor(logger,dataset, model, thr=4.0, imgsz=320):
     det = model.module.model[model.module.detector_index] if is_parallel(model) \
         else model.model[model.detector_index]
     anchor_num = det.na * det.nl
@@ -32,7 +32,7 @@ def run_anchor(logger,dataset, model, thr=4.0, imgsz=640):
     print('New anchors saved to model. Update model config to use these anchors in the future.')
 
 
-def kmean_anchors(path='./data/coco128.yaml', n=9, img_size=640, thr=4.0, gen=1000, verbose=True):
+def kmean_anchors(path='./data/coco128.yaml', n=9, img_size=320, thr=4.0, gen=1000, verbose=True):
     """ Creates kmeans-evolved anchors from training dataset
 
         Arguments:

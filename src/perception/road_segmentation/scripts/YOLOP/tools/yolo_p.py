@@ -37,13 +37,13 @@ transform=transforms.Compose([
         ])
 
 class YOLOP_Class:
-    def __init__(self, img_size=640, opt_conf_thres = 0.4, opt_iou_thres = 0.3):
+    def __init__(self, img_size=320, opt_conf_thres = 0.4, opt_iou_thres = 0.3):
         
         self.conf_thresh=opt_conf_thres
         self.iou_thresh=opt_iou_thres
         
         self.device = select_device(logger=None, device='gpu')
-        weights = '/home/reuben/Projects/DorleCoAV/src/perception/road_segmentation/scripts/YOLOP/weights/End-to-end.pth' # path too long
+        weights = '/home/dorleco/DorleCoAV/src/perception/road_segmentation/scripts/YOLOP/weights/End-to-end.pth' # path too long
         self.half = self.device.type != 'cpu'
 
         self.model = get_net(cfg)
@@ -62,6 +62,7 @@ class YOLOP_Class:
         self.model.eval()
 
     def detect(self, image):
+        torch.cuda.empty_cache()
         img, img_det, shapes = LoadImages(image)
         img = transform(img).to(self.device)
         img = img.half() if self.half else img.float()  # uint8 to fp16/32
@@ -105,8 +106,20 @@ class YOLOP_Class:
         #     for *xyxy,conf,cls in reversed(det):
         #         label_det_pred = f'{self.names[int(cls)]} {conf:.2f}'
         #         plot_one_box(xyxy, img_det , label=label_det_pred, color=self.colors[int(cls)], line_thickness=2)
-
-        return img_det, da_seg_mask, ll_seg_mask
+    
+        # del ll_seg_mask
+        # del da_seg_mask
+        # del da_predict
+        # del det_pred
+        # del inf_out
+        # del ll_seg_out
+        # del ll_predict
+        # del da_seg_out
+        # del det_out
+        # del det
+        # del img
+        torch.cuda.empty_cache()
+        return img_det #, da_seg_mask, ll_seg_mask
 
 # if __name__ == '__main__':
 
@@ -119,7 +132,7 @@ class YOLOP_Class:
 #     #                      cv2.VideoWriter_fourcc(*'MJPG'),
 #     #                      fps, size)
 
-#     yolo_p = YOLOP()
+#     yolo_p = YOLOP_Class()
 #     with torch.no_grad():
 #         while cap.isOpened():
 #             ret, frame = cap.read()
@@ -153,7 +166,7 @@ class YOLOP_Class:
 #         while cap.isOpened():
 #             ret, frame = cap.read()
 #             if ret:
-#             # frame = cv2.resize(frame, (640,540))
+#             # frame = cv2.resize(frame, (320,540))
 #                 print(frame.shape)
 
 #                 det_frame = detect(frame)

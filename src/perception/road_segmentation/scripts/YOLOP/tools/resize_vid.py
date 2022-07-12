@@ -19,7 +19,7 @@ if cap.isOpened():
         rescaled_frame = rescale_frame(frame)
         (h, w) = rescaled_frame.shape[:2]
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        writer = cv2.VideoWriter('inference/rgb_streams/video_output_540_640.mp4',
+        writer = cv2.VideoWriter('inference/rgb_streams/video_output_540_320.mp4',
                              fourcc, 60.0,
                              (w, h), True)
     else:
@@ -30,7 +30,7 @@ else:
 while cap.isOpened():
     ret, frame = cap.read()
     if ret:
-        rescaled_frame = rescale_frame(frame, shape = (540, 640))
+        rescaled_frame = rescale_frame(frame, shape = (540, 320))
 
         # write the output frame to file
         writer.write(rescaled_frame)

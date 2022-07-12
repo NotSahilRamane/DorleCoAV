@@ -9,6 +9,7 @@ from sensor_msgs.msg import Image
 
 from YOLOP.tools.yolo_p import YOLOP_Class
 
+import torch
 
 import numpy as np
 import math
@@ -49,17 +50,18 @@ class Detector:
         try:
             self.rgb_image = self.bridge.imgmsg_to_cv2(img, 'bgr8')
             # self.depth_image = self.bridge.imgmsg_to_cv2(img.depth_image, "32FC1") ## Confirm these once
-            self.callSegmentationModel()
+            self.callSegmentationModel(self.rgb_image)
         except CvBridgeError as e:
             rospy.loginfo(str(e))
     
-    def callSegmentationModel(self):
+    def callSegmentationModel(self, image):
         '''
         Call the segmentation model related functions here (Reuben, Mayur)
         and the final publish function (To be done by sahil)
         '''
-        img_det, _, _ = self.yolo_p.detect(self.rgb_image)
-        self.callPublisher(img_det)
+        with torch.no_grad():
+            img_det = self.yolo_p.detect(image)
+            self.callPublisher(img_det)
 
     def callPublisher(self, image):
         '''

@@ -241,7 +241,7 @@ def xyxy2xywh(x):
     y[:, 3] = x[:, 3] - x[:, 1]  # height
     return y
 
-def plot_images(images, targets, paths=None, fname='images.jpg', names=None, max_size=640, max_subplots=16):
+def plot_images(images, targets, paths=None, fname='images.jpg', names=None, max_size=320, max_subplots=16):
     # Plot image grid with labels
 
     if isinstance(images, torch.Tensor):

@@ -18,9 +18,9 @@ namespace Yolo
     static constexpr int MAX_OUTPUT_BBOX_COUNT = 1000;
     static constexpr int CLASS_NUM = 13;
     static constexpr int INPUT_H = 384;
-    static constexpr int INPUT_W = 640;
+    static constexpr int INPUT_W = 320;
     static constexpr int IMG_H = 360;
-    static constexpr int IMG_W = 640;
+    static constexpr int IMG_W = 320;
     // static constexpr int INPUT_H = 192;
     // static constexpr int INPUT_W = 320;
     // static constexpr int IMG_H = 180;

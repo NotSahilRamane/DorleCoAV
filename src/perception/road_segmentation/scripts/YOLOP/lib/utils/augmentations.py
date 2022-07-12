@@ -168,7 +168,7 @@ def cutout(combination, labels):
     return image, gray, labels
 
 
-def letterbox(combination, new_shape=(640, 640), color=(114, 114, 114), auto=True, scaleFill=False, scaleup=True):
+def letterbox(combination, new_shape=(320, 320), color=(114, 114, 114), auto=True, scaleFill=False, scaleup=True):
     """Resize the input image and automatically padding to suitable shape :https://zhuanlan.zhihu.com/p/172121380"""
     # Resize image to a 32-pixel-multiple rectangle https://github.com/ultralytics/yolov3/issues/232
     img, gray, line = combination
@@ -211,7 +211,7 @@ def letterbox(combination, new_shape=(640, 640), color=(114, 114, 114), auto=Tru
     combination = (img, gray, line)
     return combination, ratio, (dw, dh)
 
-def letterbox_for_img(img, new_shape=(640, 640), color=(114, 114, 114), auto=True, scaleFill=False, scaleup=True):
+def letterbox_for_img(img, new_shape=(320, 320), color=(114, 114, 114), auto=True, scaleFill=False, scaleup=True):
     # Resize image to a 32-pixel-multiple rectangle https://github.com/ultralytics/yolov3/issues/232
     shape = img.shape[:2]  # current shape [height, width]
     if isinstance(new_shape, int):

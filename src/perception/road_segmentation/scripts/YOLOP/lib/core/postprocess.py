@@ -183,7 +183,7 @@ def fitlane(mask, sel_labels, labels, stats):
                 y_limits = np.polyval(func, W-1)
                 if y_limits >= H or y_limits < 0:
                     draw_x = np.linspace(x, x+w-1, w+x-x)
-                # if x+w-1 < 640:
+                # if x+w-1 < 320:
                 #     draw_x = np.linspace(0, x+w-1, w+x-x)
                 else:
                     draw_x = np.linspace(x, W-1, W-x)
