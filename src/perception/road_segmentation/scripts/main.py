@@ -1,4 +1,4 @@
-#!/usr/bin/env python33
+#!/usr/bin/env python3
 import rospy
 from road_segmentation import Detector
 
