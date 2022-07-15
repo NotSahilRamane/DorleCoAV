@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import queue
 import cv2
 import rospy
 
@@ -12,7 +13,9 @@ from YOLOP.tools.yolo_p import YOLOP_Class
 import torch
 
 import numpy as np
-import math
+from sensor_msgs import point_cloud2
+from sensor_msgs.msg import PointCloud2, PointField
+from std_msgs.msg import Header
 
 class Detector:
     def __init__(self):
@@ -51,6 +54,7 @@ class Detector:
         rospy.loginfo("Published to topics")
         self.DetectionsPublisher = rospy.Publisher(
             self.pub_topic_name, Image, queue_size=1)
+        self.PC2Publisher = rospy.Publisher("/road/pointcloud", PointCloud2, queue_size=1)    
 
     def storeImage(self, img):
         if self.RGB_IMAGE_RECEIVED == 0:
@@ -80,6 +84,22 @@ class Detector:
             self.callSegmentationModel(self.rgb_image, self.depth_image)
             self.DEPTH_IMAGE_RECEIVED = 0
             self.RGB_IMAGE_RECEIVED = 0
+
+    def getCartesianPositions(self, depth_img, center_point, CX, FX):
+        # perpendicular and lateral distance of car from point
+        d = depth_img[center_point[1]][center_point[0]]
+        x = (center_point[0] - CX) * d / FX
+        return x, d
+
+    def calculateParamsForDistance(self, img_cv):
+        FOV = 90   # FOV of camera used in fsds
+        H, W = img_cv.shape[:2]
+        CX = W / 2  # center of x-axis
+        FX = CX / (np.tan(FOV / 2))  # focal length of x-axis
+        orig_dim = (H, W)
+
+        return orig_dim, CX, FX
+
     
     def callSegmentationModel(self, image, depth_image):
         '''
@@ -87,7 +107,27 @@ class Detector:
         and the final publish function (To be done by sahil)
         '''
         with torch.no_grad():
-            img_det = self.yolo_p.detect(image)
+            points = []
+            img_det, da_seg_mask = self.yolo_p.detect(image)
+            # print(da_seg_mask.shape, "Da seg mask")
+            depth_resized = cv2.resize(depth_image, (640, 480))
+            orig_dim, CX, FX = self.calculateParamsForDistance(depth_resized)
+            fields = [PointField('x', 0, 7, 1),
+                    PointField('y', 4, 7, 1)]
+            # print(depth_resized.shape)
+            # print(da_seg_mask)
+            for x in range(len(da_seg_mask)):
+                for y in range(len(da_seg_mask[x])):
+                    if da_seg_mask[x][y] == 1:
+                        depth = depth_image[1][0]
+                        lateral = (x - CX) * depth / FX
+                        points.append((depth, lateral))
+            header = Header()
+            header.stamp = rospy.Time.now()    
+            header.frame_id = 'ego_vehicle/rgb_front'
+            pc2 = point_cloud2.create_cloud(header, fields, points)
+            pc2.header.stamp = rospy.Time.now()
+            self.PC2Publisher.publish(pc2)
             self.callPublisher(img_det)
 
     def callPublisher(self, image):

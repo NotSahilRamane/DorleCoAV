@@ -69,6 +69,7 @@ class YOLOP_Class:
         if img.ndimension() == 3:
             img = img.unsqueeze(0)
         # Inference
+        # print(img.shape)
         det_out, da_seg_out,ll_seg_out= self.model(img)
         inf_out, _ = det_out
 
@@ -94,11 +95,18 @@ class YOLOP_Class:
         ll_seg_mask = torch.nn.functional.interpolate(ll_predict, scale_factor=int(1/ratio), mode='bilinear')
         _, ll_seg_mask = torch.max(ll_seg_mask, 1)
         ll_seg_mask = ll_seg_mask.int().squeeze().cpu().numpy()
+        # print()
         # print(da_seg_mask.shape)
         # Lane line post-processing
         # ll_seg_mask = morphological_process(ll_seg_mask, kernel_size=7, func_type=cv2.MORPH_OPEN)
         # ll_seg_mask = connect_lane(ll_seg_mask)
-
+        # print(ll_seg_mask)
+        # unique_list = []
+        # for x in da_seg_mask:
+        # # check if exists in unique_list or not
+        #     if x not in unique_list:
+        #         unique_list.append(x)
+        # print(unique_list)
         img_det = show_seg_result(img_det, (da_seg_mask, ll_seg_mask), _, _, is_demo=True)
 
         # if len(det):
@@ -119,7 +127,7 @@ class YOLOP_Class:
         # del det
         # del img
         torch.cuda.empty_cache()
-        return img_det #, da_seg_mask, ll_seg_mask
+        return img_det, da_seg_mask #, da_seg_mask, ll_seg_mask
 
 # if __name__ == '__main__':
 
