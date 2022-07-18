@@ -26,11 +26,6 @@ class Detector:
         self.yolo_p = YOLOP_Class()
         self.RGB_IMAGE_RECEIVED = 0
         self.DEPTH_IMAGE_RECEIVED = 0
-        
-    # def subscribeToTopics(self):
-    #     rospy.loginfo("Subscribed to topics")
-    #     rospy.Subscriber(self.image_topicname, depthandimage,
-    #                      self.storeImage, queue_size=1)
 
     def subscribeToTopics(self):
         rospy.loginfo("Subscribed to topics")
@@ -49,14 +44,14 @@ class Detector:
             "road_segmentation/depth_image_topic_name", "/carla/ego_vehicle/depth_front/image")
         self.pub_topic_name = rospy.get_param(
             "road_segmentation/road_segmentation_topic_name", "/camera/roadsegmentation")
-    
+
     def publishToTopics(self):
         rospy.loginfo("Published to topics")
         self.DetectionsPublisher = rospy.Publisher(
             self.pub_topic_name, Image, queue_size=1)
         self.PC2Publisher = rospy.Publisher("/road/pointcloud", PointCloud2, queue_size=1)    
 
-    def storeImage(self, img):
+    def storeImage(self, img): # Copy for Obj Detection
         if self.RGB_IMAGE_RECEIVED == 0:
             try:
                 frame = self.bridge.imgmsg_to_cv2(img, 'bgr8')
@@ -67,7 +62,7 @@ class Detector:
             self.RGB_IMAGE_RECEIVED = 1
             self.sync_frames()
 
-    def storeDepthImage(self, img):
+    def storeDepthImage(self, img): # Copy for Obj Detection
         frame=None
         if self.DEPTH_IMAGE_RECEIVED == 0:
             try:
@@ -79,73 +74,64 @@ class Detector:
             self.DEPTH_IMAGE_RECEIVED = 1
             self.sync_frames()
 
-    def sync_frames(self):
+    def sync_frames(self): # Copy for Obj Detection
         if self.RGB_IMAGE_RECEIVED == 1 and self.DEPTH_IMAGE_RECEIVED == 1:
             self.callSegmentationModel(self.rgb_image, self.depth_image)
             self.DEPTH_IMAGE_RECEIVED = 0
             self.RGB_IMAGE_RECEIVED = 0
 
-    def getCartesianPositions(self, depth_img, center_point, CX, FX):
+    def getCartesianPositions(self, depth_img, center_point, CX, FX): # Copy for Obj Detection
         # perpendicular and lateral distance of car from point
         d = depth_img[center_point[1]][center_point[0]]
         x = (center_point[0] - CX) * d / FX
         return x, d
 
-    def calculateParamsForDistance(self, img_cv):
+    def calculateParamsForDistance(self, img_cv): # Copy for Obj Detection
         FOV = 90   # FOV of camera used
         H, W = img_cv.shape[:2]
         # print(H, W, "H, W")
         CX = W / 2  # center of x-axis
-        FX = CX / (np.tan(FOV / 2))  # focal length of x-axis
+        FX = CX / (2*np.tan(FOV*3.14 /360))  # focal length of x-axis
         orig_dim = (H, W)
 
         return orig_dim, CX, FX
 
-    
-    def callSegmentationModel(self, image, depth_image):
+    def callSegmentationModel(self, image, depth_image): # Copy for Obj Detection remove for loops
         '''
         Call the segmentation model related functions here (Reuben, Mayur)
         and the final publish function (To be done by sahil)
         '''
         with torch.no_grad():
             points = []
-            img_det, da_seg_mask = self.yolo_p.detect(image)
-            # print(da_seg_mask.shape, "Da seg mask")
-            depth_resized = cv2.resize(depth_image, (480, 640))
-            # depth_resized = cv2.resize(depth_image, (640, 480))
+            da_seg_mask = self.yolo_p.detect(image)
 
-            # print(depth_resized.shape, "Depth")
+            depth_resized = cv2.resize(depth_image, (640, 480), interpolation=cv2.INTER_AREA)   
 
             orig_dim, CX, FX = self.calculateParamsForDistance(depth_resized)
-            # print(CX)
+            
             fields = [PointField('x', 0, 7, 1),
                     PointField('y', 4, 7, 1),
                     PointField('z', 8, 7, 1),
                     PointField('intensity', 12, 7, 1)]
-            # print(depth_resized.shape)
-            # print(da_seg_mask)
-            # print(da_seg_mask.shape, "DA SEG MASK")
-            # print(depth_resized.shape, "Depth")
+           
+            
             for x in range(len(da_seg_mask)):
-                # x = x + 20
+                if x + 20 > len(da_seg_mask):
                 for y in range(len(da_seg_mask[x])):
-                    
-                    # y = y + 10
                     if da_seg_mask[x][y] == 1:
-                        # print(y, x, "y, x")
-                        # depth = depth_resized[x][y]
-                        
-                        depth = depth_resized[y][x]
+                        depth = depth_resized[x][y] # instead of x, y, give pixel coordinates of Bounding boxes
+                        if depth <= 30.00:
 
-                        lateral = (x - CX) * depth / FX
-                        points.append((depth, lateral, 0, 1))
+                            lateral = (y - CX) * depth / FX
+                            if lateral > -0.1 and lateral < 0.1:
+                                print(lateral, depth)
+                                points.append((depth, lateral, 0, 1))
             header = Header()
             header.stamp = rospy.Time.now()    
             header.frame_id = 'ego_vehicle/rgb_front'
             pc2 = point_cloud2.create_cloud(header, fields, points)
             pc2.header.stamp = rospy.Time.now()
             self.PC2Publisher.publish(pc2)
-            self.callPublisher(img_det)
 
     def callPublisher(self, image):
         '''
