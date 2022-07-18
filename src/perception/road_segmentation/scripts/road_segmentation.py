@@ -60,7 +60,7 @@ class Detector:
         if self.RGB_IMAGE_RECEIVED == 0:
             try:
                 frame = self.bridge.imgmsg_to_cv2(img, 'bgr8')
-                rospy.loginfo("RGB Image Stored")
+                # rospy.loginfo("RGB Image Stored")
             except CvBridgeError as e:
                 rospy.loginfo(str(e))
             self.rgb_image = frame
@@ -72,7 +72,7 @@ class Detector:
         if self.DEPTH_IMAGE_RECEIVED == 0:
             try:
                 frame = self.bridge.imgmsg_to_cv2(img, "32FC1")
-                rospy.loginfo("Depth Image Stored")
+                # rospy.loginfo("Depth Image Stored")
             except CvBridgeError as e:
                 rospy.loginfo(str(e))
             self.depth_image = frame
@@ -92,8 +92,9 @@ class Detector:
         return x, d
 
     def calculateParamsForDistance(self, img_cv):
-        FOV = 90   # FOV of camera used in fsds
+        FOV = 90   # FOV of camera used
         H, W = img_cv.shape[:2]
+        # print(H, W, "H, W")
         CX = W / 2  # center of x-axis
         FX = CX / (np.tan(FOV / 2))  # focal length of x-axis
         orig_dim = (H, W)
@@ -110,18 +111,34 @@ class Detector:
             points = []
             img_det, da_seg_mask = self.yolo_p.detect(image)
             # print(da_seg_mask.shape, "Da seg mask")
-            depth_resized = cv2.resize(depth_image, (640, 480))
+            depth_resized = cv2.resize(depth_image, (480, 640))
+            # depth_resized = cv2.resize(depth_image, (640, 480))
+
+            # print(depth_resized.shape, "Depth")
+
             orig_dim, CX, FX = self.calculateParamsForDistance(depth_resized)
+            # print(CX)
             fields = [PointField('x', 0, 7, 1),
-                    PointField('y', 4, 7, 1)]
+                    PointField('y', 4, 7, 1),
+                    PointField('z', 8, 7, 1),
+                    PointField('intensity', 12, 7, 1)]
             # print(depth_resized.shape)
             # print(da_seg_mask)
+            # print(da_seg_mask.shape, "DA SEG MASK")
+            # print(depth_resized.shape, "Depth")
             for x in range(len(da_seg_mask)):
+                # x = x + 20
                 for y in range(len(da_seg_mask[x])):
+                    
+                    # y = y + 10
                     if da_seg_mask[x][y] == 1:
-                        depth = depth_image[1][0]
+                        # print(y, x, "y, x")
+                        # depth = depth_resized[x][y]
+                        
+                        depth = depth_resized[y][x]
+
                         lateral = (x - CX) * depth / FX
-                        points.append((depth, lateral))
+                        points.append((depth, lateral, 0, 1))
             header = Header()
             header.stamp = rospy.Time.now()    
             header.frame_id = 'ego_vehicle/rgb_front'

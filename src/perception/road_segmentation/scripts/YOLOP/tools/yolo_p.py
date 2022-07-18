@@ -43,7 +43,7 @@ class YOLOP_Class:
         self.iou_thresh=opt_iou_thres
         
         self.device = select_device(logger=None, device='gpu')
-        weights = '/home/sahil/DorleCoAV/src/perception/road_segmentation/scripts/YOLOP/weights/End-to-end.pth' # path too long
+        weights = '/home/dorleco/DorleCoAV/src/perception/road_segmentation/scripts/YOLOP/weights/End-to-end.pth' # path too long
         self.half = self.device.type != 'cpu'
 
         self.model = get_net(cfg)
