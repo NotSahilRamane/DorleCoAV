@@ -74,14 +74,41 @@ class Detector:
             self.RGB_IMAGE_RECEIVED = 1
             self.sync_frames()
     
-    def callSegmentationModel(self):
+    def callSegmentationModel(self, image, depth_image): # Copy for Obj Detection remove for loops
         '''
         Call the segmentation model related functions here (Reuben, Mayur)
         and the final publish function (To be done by sahil)
         '''
         with torch.no_grad():
-            img_det, _, _ = self.yolo_p.detect(self.rgb_image)
-        self.callPublisher(img_det)
+            points = []
+            da_seg_mask = self.yolo_p.detect(image)
+
+            depth_resized = cv2.resize(depth_image, (640, 480), interpolation=cv2.INTER_AREA)   
+
+            orig_dim, CX, FX = self.calculateParamsForDistance(depth_resized)
+            
+            fields = [PointField('x', 0, 7, 1),
+                    PointField('y', 4, 7, 1),
+                    PointField('z', 8, 7, 1),
+                    PointField('intensity', 12, 7, 1)]
+           
+            
+            for x in range(len(da_seg_mask)):
+                depth = depth_resized[x][y] # instead of x, y, give pixel coordinates of Bounding boxes
+                if depth <= 30.00:
+
+                    lateral = (y - CX) * depth / FX
+                    if lateral > -0.1 and lateral < 0.1:
+                        print(lateral, depth)
+                        points.append((depth, lateral, 0, 1))                if x + 20 > len(da_seg_mask):
+                    for y in range(len(da_seg_mask[x])):
+                        if da_seg_mask[x][y] == 1:
+            header = Header()
+            header.stamp = rospy.Time.now()    
+            header.frame_id = 'ego_vehicle/rgb_front'
+            pc2 = point_cloud2.create_cloud(header, fields, points)
+            pc2.header.stamp = rospy.Time.now()
+            self.PC2Publisher.publish(pc2)
 
     def callPublisher(self, image):
         '''
