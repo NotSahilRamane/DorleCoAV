@@ -93,16 +93,14 @@ class Detector:
                     PointField('intensity', 12, 7, 1)]
            
             
-            for x in range(len(da_seg_mask)):
+            for x in):
                 depth = depth_resized[x][y] # instead of x, y, give pixel coordinates of Bounding boxes
                 if depth <= 30.00:
 
                     lateral = (y - CX) * depth / FX
                     if lateral > -0.1 and lateral < 0.1:
                         print(lateral, depth)
-                        points.append((depth, lateral, 0, 1))                if x + 20 > len(da_seg_mask):
-                    for y in range(len(da_seg_mask[x])):
-                        if da_seg_mask[x][y] == 1:
+                        points.append((depth, lateral, 0, 1))
             header = Header()
             header.stamp = rospy.Time.now()    
             header.frame_id = 'ego_vehicle/rgb_front'
