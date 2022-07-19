@@ -38,7 +38,7 @@ class Detector:
     def subscribeToTopics(self):
         rospy.loginfo("Subscribed to topics")
         rospy.Subscriber(self.image_topicname, Image,
-                         self.storeImage, queue_size=1)
+                         self.storeImage, buff_size = 2**24, queue_size=1)
         rospy.Subscriber(self.depth_image_topicname, Image,
                         self.storeDepthImage, queue_size=1)
 
