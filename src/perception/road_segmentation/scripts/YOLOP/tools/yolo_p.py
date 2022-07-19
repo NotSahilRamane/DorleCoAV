@@ -91,10 +91,10 @@ class YOLOP_Class:
         # da_seg_mask = morphological_process(da_seg_mask, kernel_size=7)
 
         
-        # ll_predict = ll_seg_out[:, :,pad_h:(height-pad_h),pad_w:(width-pad_w)]
-        # ll_seg_mask = torch.nn.functional.interpolate(ll_predict, scale_factor=int(1/ratio), mode='bilinear')
-        # _, ll_seg_mask = torch.max(ll_seg_mask, 1)
-        # ll_seg_mask = ll_seg_mask.int().squeeze().cpu().numpy()
+        ll_predict = ll_seg_out[:, :,pad_h:(height-pad_h),pad_w:(width-pad_w)]
+        ll_seg_mask = torch.nn.functional.interpolate(ll_predict, scale_factor=int(1/ratio), mode='bilinear')
+        _, ll_seg_mask = torch.max(ll_seg_mask, 1)
+        ll_seg_mask = ll_seg_mask.int().squeeze().cpu().numpy()
         # print()
         # print(da_seg_mask.shape)
         # Lane line post-processing
@@ -107,7 +107,7 @@ class YOLOP_Class:
         #     if x not in unique_list:
         #         unique_list.append(x)
         # print(unique_list)
-        # img_det = show_seg_result(img_det, (da_seg_mask, ll_seg_mask), _, _, is_demo=True)
+        img_det = show_seg_result(img_det, (da_seg_mask, ll_seg_mask), _, _, is_demo=True)
 
         # if len(det):
         #     det[:,:4] = scale_coords(img.shape[2:],det[:,:4],img_det.shape).round()
@@ -127,7 +127,7 @@ class YOLOP_Class:
         # del det
         # del img
         torch.cuda.empty_cache()
-        return da_seg_mask #, da_seg_mask, ll_seg_mask
+        return da_seg_mask, ll_seg_mask, img_det #, da_seg_mask, ll_seg_mask
 
 # if __name__ == '__main__':
 

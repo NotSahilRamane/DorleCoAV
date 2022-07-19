@@ -30,7 +30,7 @@ class Detector:
     def subscribeToTopics(self):
         rospy.loginfo("Subscribed to topics")
         rospy.Subscriber(self.image_topicname, Image,
-                         self.storeImage, queue_size=1)
+                         self.storeImage, buff_size = 2**24, queue_size=1)
         rospy.Subscriber(self.depth_image_topicname, Image,
                          self.storeDepthImage, queue_size=1)
 
@@ -103,7 +103,7 @@ class Detector:
         '''
         with torch.no_grad():
             points = []
-            da_seg_mask = self.yolo_p.detect(image)
+            da_seg_mask, ll_seg_mask, image_detections = self.yolo_p.detect(image)
 
             depth_resized = cv2.resize(depth_image, (640, 480), interpolation=cv2.INTER_AREA)   
 
@@ -113,17 +113,35 @@ class Detector:
                     PointField('y', 4, 7, 1),
                     PointField('z', 8, 7, 1),
                     PointField('intensity', 12, 7, 1)]
-           
             
-            # for x in range(len(da_seg_mask)):
-            #     for y in range(len(da_seg_mask[x])):
+            # x, y = 0, 0
+            # while x < len(da_seg_mask):
+            #     while y < len(da_seg_mask[x]):
             #         if da_seg_mask[x][y] == 1:
             #             depth = depth_resized[x][y] # instead of x, y, give pixel coordinates of Bounding boxes
             #             if depth <= 30.00:
             #                 lateral = (y - CX) * depth / FX
             #                 if lateral > -0.1 and lateral < 0.1:
-            #                     print(lateral, depth)
+            #                     # print(lateral, depth)
             #                     points.append((depth, lateral, 0, 1))
+            #                     print(x, y)
+            #         if y + 10 > len(da_seg_mask[x]):
+            #             y = len(da_seg_mask[x]) - 1
+            #         else:
+            #             y = y + 10
+            #     if x + 10 > len(da_seg_mask):
+            #         x = len(da_seg_mask) - 1
+
+            for x in range(0, len(da_seg_mask), 10):
+                for y in range(0, len(da_seg_mask[x]), 10):
+                    if da_seg_mask[x][y] == 1 or ll_seg_mask[x][y]:
+                        depth = depth_resized[x][y] # instead of x, y, give pixel coordinates of Bounding boxes
+                        if depth <= 30.00:
+                            lateral = (y - CX) * depth / FX
+                            if lateral > -0.5 and lateral < 0.5:
+                                # print(lateral, depth)
+                                points.append((depth, lateral, 0, 1))
+                                # print(x, y)
             #         if y + 10 > len(da_seg_mask[x]):
             #             y = len(da_seg_mask[x]) - 1
             #         else:
@@ -136,6 +154,8 @@ class Detector:
             header.frame_id = 'ego_vehicle/rgb_front'
             pc2 = point_cloud2.create_cloud(header, fields, points)
             pc2.header.stamp = rospy.Time.now()
+            print("Published")
+            self.callPublisher(image_detections)
             self.PC2Publisher.publish(pc2)
 
     def callPublisher(self, image):
