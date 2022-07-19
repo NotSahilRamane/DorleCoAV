@@ -8,7 +8,7 @@ import cv2
 import matplotlib.pyplot as plt
 
 # This is a function that takes our bounding boxes, and converts them into a list data type. 
-from helpers.convert_boxes import convert_boxes
+from helper_fns.convert_boxes import convert_boxes
 
 # Here are the core deep-sort functions. 
 
@@ -28,9 +28,9 @@ from deep_sort.yoloV5 import YOLO_Fast
 
 class DeepSORT:
 
-    def __init__(self, class_names_file='Tracking_DeepSORT/data/labels/coco.names', 
-    yolo_model='./Tracking_DeepSORT/deep_sort/onnx_models/yolov5m.onnx',
-    model_filename='Tracking_DeepSORT/model_data/mars-small128.pb', visualize=True):
+    def __init__(self, class_names_file='/home/reuben/Projects/DorleCoAV/src/perception/road_segmentation/scripts/Tracking_DeepSORT/data/labels/coco.names', 
+    yolo_model='/home/reuben/Projects/DorleCoAV/src/perception/road_segmentation/scripts/Tracking_DeepSORT/deep_sort/onnx_models/yolov5s.onnx',
+    model_filename='/home/reuben/Projects/DorleCoAV/src/perception/road_segmentation/scripts/Tracking_DeepSORT/model_data/mars-small128.pb', visualize=True):
 
         self.class_names = [c.strip() for c in open(os.path.abspath(class_names_file)).readlines()]
         self.yolo = YOLO_Fast(sc_thresh=.5, nms_thresh=.45, cnf_thresh=.45, model=yolo_model)
@@ -139,10 +139,11 @@ class DeepSORT:
         return img_in, center_arr
 
 
-vid = cv2.VideoCapture('Tracking_DeepSORT/data/video/MOT16-13-raw.webm')
-deepsort  = DeepSORT(class_names_file='Tracking_DeepSORT/data/labels/coco.names', 
-    yolo_model='./Tracking_DeepSORT/deep_sort/onnx_models/yolov5m.onnx',
-    model_filename='Tracking_DeepSORT/model_data/mars-small128.pb', visualize=True)
+vid = cv2.VideoCapture('/home/reuben/Projects/DorleCoAV/src/perception/road_segmentation/scripts/Tracking_DeepSORT/data/video/MOT16-13-raw.webm')
+# deepsort  = DeepSORT(class_names_file='Tracking_DeepSORT/data/labels/coco.names', 
+#     yolo_model='./Tracking_DeepSORT/deep_sort/onnx_models/yolov5m.onnx',
+#     model_filename='Tracking_DeepSORT/model_data/mars-small128.pb', visualize=True)
+deepsort = DeepSORT()
 while True:
     _, img = vid.read()
     if img is None:

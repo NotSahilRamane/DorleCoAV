@@ -10,7 +10,7 @@ from sensor_msgs.msg import Image
 from YOLOP.tools.yolo_p import YOLOP_Class
 from Tracking_DeepSORT.tracking_and_depth import DeepSORT
 
-import torch
+# import torch
 
 import numpy as np
 from sensor_msgs import point_cloud2
@@ -24,7 +24,7 @@ class Detector:
         self.rgb_image = None
         self.depth_image = None
         self.yolo_p = YOLOP_Class()
-        self.deepsort = DeepSORT(class_names_file='Tracking_DeepSORT/data/labels/coco.names', 
+        self.deepsort = DeepSORT(class_names_file='/home/reuben/Projects/DorleCoAV/src/perception/road_segmentation/scripts/Tracking_DeepSORT/data/labels/coco.names', 
                                 yolo_model='./Tracking_DeepSORT/deep_sort/onnx_models/yolov5m.onnx',
                                 model_filename='Tracking_DeepSORT/model_data/mars-small128.pb', visualize=True)
         self.RGB_IMAGE_RECEIVED = 0
