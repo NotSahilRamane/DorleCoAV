@@ -8,7 +8,7 @@ import cv2
 import matplotlib.pyplot as plt
 
 # This is a function that takes our bounding boxes, and converts them into a list data type. 
-from helper_fns.convert_boxes import convert_boxes
+from deep_sort import convert_boxes
 
 # Here are the core deep-sort functions. 
 
@@ -66,7 +66,7 @@ class DeepSORT:
         for i in range(len(classes)):
             names.append(self.class_names[int(classes[i])])
         names = np.array(names)
-        converted_boxes = convert_boxes(img_in, boxes[0])
+        converted_boxes = convert_boxes.convert_boxes(img_in, boxes[0])
         # we extract the features corresponding to each bounding box detected. 
         features = self.encoder(img_in, converted_boxes)
 
