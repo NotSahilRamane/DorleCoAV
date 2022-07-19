@@ -8,23 +8,23 @@ import cv2
 import matplotlib.pyplot as plt
 
 # This is a function that takes our bounding boxes, and converts them into a list data type. 
-from deep_sort import convert_boxes
+from Tracking_DeepSORT.deep_sort import convert_boxes
 
 # Here are the core deep-sort functions. 
 
 # Pre-processing contains the code for the non-maxima suppresion
-from deep_sort import preprocessing
+from Tracking_DeepSORT.deep_sort import preprocessing
 # nn-matching contains all the code to implement the cost function to associate tracks
-from deep_sort import nn_matching
+from Tracking_DeepSORT.deep_sort import nn_matching
 # Here is a class to hold all the information in a single detection from yolo()
-from deep_sort.detection import Detection
+from Tracking_DeepSORT.deep_sort.detection import Detection
 # Here is the Tracker class to hold all information regarding a tracked object. This is the key class - make sure to open up the files and understand
 # the methods implemented
-from deep_sort.tracker import Tracker
-from tools import generate_detections as gdet
+from Tracking_DeepSORT.deep_sort.tracker import Tracker
+from Tracking_DeepSORT.tools import generate_detections as gdet
 
 # we import the yolo class we created in the previous project
-from deep_sort.yoloV5 import YOLO_Fast
+from Tracking_DeepSORT.deep_sort.yoloV5 import YOLO_Fast
 
 class DeepSORT:
 
@@ -139,29 +139,27 @@ class DeepSORT:
         return img_in, center_arr
 
 
-vid = cv2.VideoCapture('/home/reuben/Projects/DorleCoAV/src/perception/road_segmentation/scripts/Tracking_DeepSORT/data/video/MOT16-13-raw.webm')
-# deepsort  = DeepSORT(class_names_file='Tracking_DeepSORT/data/labels/coco.names', 
-#     yolo_model='./Tracking_DeepSORT/deep_sort/onnx_models/yolov5m.onnx',
-#     model_filename='Tracking_DeepSORT/model_data/mars-small128.pb', visualize=True)
-deepsort = DeepSORT()
-while True:
-    _, img = vid.read()
-    if img is None:
-        print('Completed')
-        break
+# vid = cv2.VideoCapture('/home/reuben/Projects/DorleCoAV/src/perception/road_segmentation/scripts/Tracking_DeepSORT/data/video/MOT16-13-raw.webm')
+
+# deepsort = DeepSORT()
+# while True:
+#     _, img = vid.read()
+#     if img is None:
+#         print('Completed')
+#         break
     
-    img = cv2.resize(img, (640,640)) # We resize to (640, 640) since YOLOv5 was trained on this shape
-    img_copy = np.copy(img)
-    img_out, c = deepsort.do_object_detection(img_copy)
-    print(c)
-    cv2.namedWindow('output')
-    # cv2.resizeWindow('output', 1424, 1068)
-    cv2.imshow('output', img_out)
+#     img = cv2.resize(img, (640,640)) # We resize to (640, 640) since YOLOv5 was trained on this shape
+#     img_copy = np.copy(img)
+#     img_out, c = deepsort.do_object_detection(img_copy)
+#     print(c)
+#     cv2.namedWindow('output')
+#     # cv2.resizeWindow('output', 1424, 1068)
+#     cv2.imshow('output', img_out)
 
-    if cv2.waitKey(1) == ord('q'):
-        break
+#     if cv2.waitKey(1) == ord('q'):
+#         break
 
-cv2.destroyAllWindows()
+# cv2.destroyAllWindows()
 
 
 
