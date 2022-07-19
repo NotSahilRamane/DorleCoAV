@@ -8,6 +8,7 @@ from sensor_msgs.msg import Image
 # from av_messages.msg import depthandimage
 
 from YOLOP.tools.yolo_p import YOLOP_Class
+from Tracking_DeepSORT.tracking_and_depth import DeepSORT
 
 import torch
 
@@ -23,6 +24,9 @@ class Detector:
         self.rgb_image = None
         self.depth_image = None
         self.yolo_p = YOLOP_Class()
+        self.deepsort = DeepSORT(class_names_file='Tracking_DeepSORT/data/labels/coco.names', 
+                                yolo_model='./Tracking_DeepSORT/deep_sort/onnx_models/yolov5m.onnx',
+                                model_filename='Tracking_DeepSORT/model_data/mars-small128.pb', visualize=True)
         self.RGB_IMAGE_RECEIVED = 0
         self.DEPTH_IMAGE_RECEIVED = 0
         
@@ -79,28 +83,27 @@ class Detector:
         Call the segmentation model related functions here (Reuben, Mayur)
         and the final publish function (To be done by sahil)
         '''
-        with torch.no_grad():
-            points = []
-            da_seg_mask = self.yolo_p.detect(image)
+        points = []
+        img, tracked_boxes = self.deepsort.detect(image)
 
-            depth_resized = cv2.resize(depth_image, (640, 480), interpolation=cv2.INTER_AREA)   
+        depth_resized = cv2.resize(depth_image, (640, 480), interpolation=cv2.INTER_AREA)   
 
-            orig_dim, CX, FX = self.calculateParamsForDistance(depth_resized)
+        orig_dim, CX, FX = self.calculateParamsForDistance(depth_resized)
             
-            fields = [PointField('x', 0, 7, 1),
+        fields = [PointField('x', 0, 7, 1),
                     PointField('y', 4, 7, 1),
                     PointField('z', 8, 7, 1),
                     PointField('intensity', 12, 7, 1)]
            
             
-            for x in):
-                depth = depth_resized[x][y] # instead of x, y, give pixel coordinates of Bounding boxes
-                if depth <= 30.00:
+        for x, y in tracked_boxes:
+            depth = depth_resized[x][y] # instead of x, y, give pixel coordinates of Bounding boxes
+            if depth <= 30.00:
 
-                    lateral = (y - CX) * depth / FX
-                    if lateral > -0.1 and lateral < 0.1:
-                        print(lateral, depth)
-                        points.append((depth, lateral, 0, 1))
+                lateral = (y - CX) * depth / FX
+                if lateral > -0.1 and lateral < 0.1:
+                    print(lateral, depth)
+                    points.append((depth, lateral, 0, 1))
             header = Header()
             header.stamp = rospy.Time.now()    
             header.frame_id = 'ego_vehicle/rgb_front'
