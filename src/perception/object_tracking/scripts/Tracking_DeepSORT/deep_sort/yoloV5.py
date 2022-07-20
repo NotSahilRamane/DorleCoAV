@@ -20,7 +20,7 @@ class YOLO_Fast(): # outputs tlbr bounding boxes
     
     # Constructor
     # We create  a constructor that takes in score, confidence and nms thresholds, along with which model to use. 
-    def __init__(self, sc_thresh=.5, nms_thresh=.45, cnf_thresh=.45, model="./Single-Multiple-Custom-Object-Detection-and-Tracking/deep_sort/onnx_models/yolov5s.onnx"):
+    def __init__(self, sc_thresh=.5, nms_thresh=.45, cnf_thresh=.45, model="/home/reuben/Projects/DorleCoAV/src/perception/object_tracking/scripts/Tracking_DeepSORT/deep_sort/onnx_models/yolov5s.onnx"):
         # Our model (YOLOv5) architecture expects a 640px by 640px image as input
         self.INPUT_WIDTH = 640
         self.INPUT_HEIGHT = 640
@@ -41,7 +41,7 @@ class YOLO_Fast(): # outputs tlbr bounding boxes
         self.YELLOW = (0, 255, 255)
         
         # Network & Classes
-        classesFile = "/home/reuben/Projects/DorleCoAV/src/perception/road_segmentation/scripts/Tracking_DeepSORT/data/labels/coco.names"
+        classesFile = "/home/reuben/Projects/DorleCoAV/src/perception/object_tracking/scripts/Tracking_DeepSORT/data/labels/coco.names"
         self.classes = None
         # A handy way to read all the classes from a file, without needed to hardcode each one
         with open(classesFile, 'rt') as f:

@@ -24,9 +24,7 @@ class Detector:
         self.rgb_image = None
         self.depth_image = None
         # self.yolo_p = YOLOP_Class()
-        self.deepsort = DeepSORT(class_names_file='/home/reuben/Projects/DorleCoAV/src/perception/road_segmentation/scripts/Tracking_DeepSORT/data/labels/coco.names', 
-                                yolo_model='./Tracking_DeepSORT/deep_sort/onnx_models/yolov5m.onnx',
-                                model_filename='Tracking_DeepSORT/model_data/mars-small128.pb', visualize=True)
+        self.deepsort = DeepSORT(visualize=True)
         self.RGB_IMAGE_RECEIVED = 0
         self.DEPTH_IMAGE_RECEIVED = 0
 
@@ -34,19 +32,16 @@ class Detector:
         rospy.loginfo("Subscribed to topics")
         rospy.Subscriber(self.image_topicname, Image,
                          self.storeImage, buff_size = 2**24, queue_size=1)
-        rospy.Subscriber(self.depth_image_topicname, Image,
+        rospy.Subscriber(self.depth_image_topic_name, Image,
                         self.storeDepthImage, queue_size=1)
 
     def loadParameters(self):
-        '''
-        do something
-        '''
         self.image_topicname = rospy.get_param(
-            "camera_object_detector/image_topic_name", "/carla/ego_vehicle/rgb_front/image")
+            "object_tracking/image_topic_name", "/carla/ego_vehicle/rgb_front/image")
+        self.depth_image_topic_name = rospy.get_param(
+            "object_tracking/depth_image_topic_name", "/carla/ego_vehicle/depth_front/image")
         self.pub_topic_name = rospy.get_param(
-            "road_segmentation/depth_image_topic_name", "/carla/ego_vehicle/depth_front/image")
-        self.pub_topic_name = rospy.get_param(
-            "road_segmentation/road_segmentation_topic_name", "/camera/roadsegmentation")
+            "object_tracking/road_segmentation_topic_name", "/camera/roadsegmentation")
     
     def publishToTopics(self):
         rospy.loginfo("Published to topics")
@@ -99,7 +94,8 @@ class Detector:
         and the final publish function (To be done by sahil)
         '''
         points = []
-        img, tracked_boxes = self.deepsort.detect(image)
+        img, tracked_boxes = self.deepsort.detect(image) # take care of case when tracked_boxes is empty
+        print(tracked_boxes)
 
         depth_resized = cv2.resize(depth_image, (640, 480), interpolation=cv2.INTER_AREA)   
 
@@ -111,20 +107,21 @@ class Detector:
                     PointField('intensity', 12, 7, 1)]
            
             
-        for x, y in tracked_boxes:
-            depth = depth_resized[x][y] # instead of x, y, give pixel coordinates of Bounding boxes
-            if depth <= 30.00:
+        # for x, y in tracked_boxes:
+        #     depth = depth_resized[x][y] # instead of x, y, give pixel coordinates of Bounding boxes
+        #     if depth <= 30.00:
 
-                lateral = (y - CX) * depth / FX
-                if lateral > -0.1 and lateral < 0.1:
-                    print(lateral, depth)
-                    points.append((depth, lateral, 0, 1))
-            header = Header()
-            header.stamp = rospy.Time.now()    
-            header.frame_id = 'ego_vehicle/rgb_front'
-            pc2 = point_cloud2.create_cloud(header, fields, points)
-            pc2.header.stamp = rospy.Time.now()
-            self.PC2Publisher.publish(pc2)
+        #         lateral = (y - CX) * depth / FX
+        #         if lateral > -0.1 and lateral < 0.1:
+        #             print(lateral, depth)
+        #             points.append((depth, lateral, 0, 1))
+        #     header = Header()
+        #     header.stamp = rospy.Time.now()    
+        #     header.frame_id = 'ego_vehicle/rgb_front'
+        #     pc2 = point_cloud2.create_cloud(header, fields, points)
+        #     pc2.header.stamp = rospy.Time.now()
+        #     self.PC2Publisher.publish(pc2)
+        self.callPublisher(img)
 
     def callPublisher(self, image):
         '''

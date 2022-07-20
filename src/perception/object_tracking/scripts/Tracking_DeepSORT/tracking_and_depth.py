@@ -28,9 +28,9 @@ from Tracking_DeepSORT.deep_sort.yoloV5 import YOLO_Fast
 
 class DeepSORT:
 
-    def __init__(self, class_names_file='/home/reuben/Projects/DorleCoAV/src/perception/road_segmentation/scripts/Tracking_DeepSORT/data/labels/coco.names', 
-    yolo_model='/home/reuben/Projects/DorleCoAV/src/perception/road_segmentation/scripts/Tracking_DeepSORT/deep_sort/onnx_models/yolov5s.onnx',
-    model_filename='/home/reuben/Projects/DorleCoAV/src/perception/road_segmentation/scripts/Tracking_DeepSORT/model_data/mars-small128.pb', visualize=True):
+    def __init__(self, class_names_file='/home/reuben/Projects/DorleCoAV/src/perception/object_tracking/scripts/Tracking_DeepSORT/data/labels/coco.names', 
+    yolo_model='/home/reuben/Projects/DorleCoAV/src/perception/object_tracking/scripts/Tracking_DeepSORT/deep_sort/onnx_models/yolov5s.onnx',
+    model_filename='/home/reuben/Projects/DorleCoAV/src/perception/object_tracking/scripts/Tracking_DeepSORT/model_data/mars-small128.pb', visualize=True):
 
         self.class_names = [c.strip() for c in open(os.path.abspath(class_names_file)).readlines()]
         self.yolo = YOLO_Fast(sc_thresh=.5, nms_thresh=.45, cnf_thresh=.45, model=yolo_model)
