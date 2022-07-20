@@ -52,9 +52,9 @@ class ADAS_Features:
         error = numpy.zeros(100)
         error_y = numpy.zeros(100)
         initial_rel_dist = 100
-        initial_ego_vel = 0
+        initial_ego_vel = extractEgoVehVelocity.ego_velocity_x
         initial_acc_set_speed = 10
-        initial_ttc = 50
+        initial_ttc = initial_rel_dist/initial_ego_vel
         initial_ego_acc = 1
 
         # initialise an object at the beginning of the simulation. 
@@ -67,11 +67,11 @@ class ADAS_Features:
         for current_time in range(100):
             #print(current_time)
             # define the inputs to be taken from perception module 
-            rel_dist = aeb.MOO 
+            rel_dist = aeb.MOO
 
             #ego_vel = None 
             acc_set_speed = 10 
-            ttc = 50 - current_time*dt 
+            #ttc = 50 - current_time*dt 
             #ego_acc = None 
             driver_brake = 0 
 
@@ -82,7 +82,7 @@ class ADAS_Features:
             aeb.relative_dist = rel_dist
             aeb.ego_vel = ego_vel
             aeb.ACC_set_speed = acc_set_speed
-            aeb.ttc = ttc
+            aeb.ttc = rel_dist/ego_vel
             aeb.ego_acc = ego_acc  
 
             # perform the functions using the updated attributes
