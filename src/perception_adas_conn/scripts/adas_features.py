@@ -46,10 +46,28 @@ class ADAS_Features:
         self.ego_velocity_angular = odometry.angular.z
 
     def Algorithm(self):
+        # inputs and parameters before simulation starts 
+        end_time = 10             # set simulation end time
+        dt = 0.1                    # set the resolution    
+        error = numpy.zeros(100)
+        error_y = numpy.zeros(100)
+        initial_rel_dist = 100
+        initial_ego_vel = 0
+        initial_acc_set_speed = 10
+        initial_ttc = 50
+        initial_ego_acc = 1
+
+        # initialise an object at the beginning of the simulation. 
+        # same object keeps on updating as the simulation runs          
+        aeb = AEB_Controller(initial_rel_dist, initial_ego_vel, initial_acc_set_speed, initial_ttc, initial_ego_acc)
+        ego_vel = initial_ego_vel
+        ego_acc = initial_ego_acc
+        # all the code below goes in a for or while loop with iterator as "current_time"
+        ############
         for current_time in range(100):
             #print(current_time)
             # define the inputs to be taken from perception module 
-            rel_dist = 100 - current_time 
+            rel_dist = aeb.MOO 
 
             #ego_vel = None 
             acc_set_speed = 10 
