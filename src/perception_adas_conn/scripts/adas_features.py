@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 
-import cv2
 import rospy
 
-from cv_bridge import CvBridge, CvBridgeError
 from av_messages.msg import object
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
@@ -36,7 +34,7 @@ class ADAS_Features:
         
     def extractDataMOO(self, obj_data):
         MOT_velocity = obj_data.object_state_dt
-        MOT_position = obj_data.positionobject_state_dt
+        MOT_position = obj_data.position
 
     def extractDataRoadSeg(self, seg_data):
         go_flag = seg_data.linear.x
