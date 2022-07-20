@@ -46,9 +46,44 @@ class ADAS_Features:
         self.ego_velocity_angular = odometry.angular.z
 
     def Algorithm(self):
-        '''
-        Add algorithm related fns here
-        '''
+        for current_time in range(100):
+            #print(current_time)
+            # define the inputs to be taken from perception module 
+            rel_dist = 100 - current_time 
+
+            #ego_vel = None 
+            acc_set_speed = 10 
+            ttc = 50 - current_time*dt 
+            #ego_acc = None 
+            driver_brake = 0 
+
+            print(rel_dist, ttc)
+
+
+            # update the aeb attributes using the above inputs 
+            aeb.relative_dist = rel_dist
+            aeb.ego_vel = ego_vel
+            aeb.ACC_set_speed = acc_set_speed
+            aeb.ttc = ttc
+            aeb.ego_acc = ego_acc  
+
+            # perform the functions using the updated attributes
+            # other attributes will get updated as the function runs
+            aeb.stop_bool = aeb.TTC_non_positive()
+            aeb.FCW_Stopping_Time = aeb.stopping_time()
+            aeb.PB1_Stopping_Time, aeb.PB2_Stopping_Time, aeb.FB_Stopping_Time = aeb.stopping_time_calc()
+            acc_acceleration = aeb.acc_controller(current_time)
+            aeb_deceleration, aeb_status, fcw_status = aeb.AEB_state_machine()
+
+            brakecontrol = Brake_Control(acc_acceleration, aeb_deceleration, driver_brake)
+            brake_command = brakecontrol.final_decel()
+            throttle = Throttle_control(aeb_status, acc_acceleration)
+            throttle_command = throttle.switch()
+            ego_acc = throttle_command
+            ego_vel += (throttle_command )*dt
+
+            print("brake = {}".format(brake_command))
+            print("throttle = {}".format(throttle_command))
         controls = 1.0 # just for the time being
         self.callPublisher(controls)
 
