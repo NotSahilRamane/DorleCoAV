@@ -3,6 +3,7 @@
 import queue
 import cv2
 import rospy
+import torch
 
 from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import Image
@@ -10,7 +11,6 @@ from sensor_msgs.msg import Image
 from geometry_msgs.msg import Twist
 from YOLOP.tools.yolo_p import YOLOP_Class
 
-import torch
 
 import numpy as np
 from sensor_msgs import point_cloud2
@@ -124,7 +124,7 @@ class Detector:
                         
                         if depth <= 30.00:
                             lateral = (y - CX) * depth / FX
-                            if lateral > -1 and lateral < 1:
+                            if lateral > -3 and lateral < 1:
                                 # print(lateral, depth)
                                 if depth > max_depth:
                                     max_depth = depth
@@ -137,7 +137,7 @@ class Detector:
             #     if x + 10 > len(da_seg_mask):
             #         x = len(da_seg_mask) - 1
             flag_message = Twist()
-            if max_depth <= 15:
+            if max_depth <= 30:
                 flag_message.linear.x = 1
                 flag_message.linear.y = max_depth
             else:
