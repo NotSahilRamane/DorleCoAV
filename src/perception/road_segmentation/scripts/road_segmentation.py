@@ -110,13 +110,19 @@ class Detector:
             depth_resized = cv2.resize(depth_image, (640, 480), interpolation=cv2.INTER_AREA)   
 
             orig_dim, CX, FX = self.calculateParamsForDistance(depth_resized)
-            
-            fields = [PointField('x', 0, 7, 1),
-                    PointField('y', 4, 7, 1),
-                    PointField('z', 8, 7, 1),
-                    PointField('intensity', 12, 7, 1)]
-            max_depth = 0
 
+            one_d = 0
+            m_one_d = 0
+            half_d = 0
+            m_half_d = 0
+            zero_d = 0
+
+            # fields = [PointField('x', 0, 7, 1),
+            #         PointField('y', 4, 7, 1),
+            #         PointField('z', 8, 7, 1),
+            #         PointField('intensity', 12, 7, 1)]
+            max_depth = 0
+            
             for x in range(0, len(da_seg_mask), 2):
                 for y in range(0, len(da_seg_mask[x]), 2):
                     if da_seg_mask[x][y] == 1 or ll_seg_mask[x][y]:
@@ -124,18 +130,11 @@ class Detector:
                         
                         if depth <= 30.00:
                             lateral = (y - CX) * depth / FX
-                            if lateral > -3 and lateral < 1:
-                                # print(lateral, depth)
-                                if depth > max_depth:
-                                    max_depth = depth
-                                points.append((depth, lateral, 0, 1))
-                                # print(x, y)
-            #         if y + 10 > len(da_seg_mask[x]):
-            #             y = len(da_seg_mask[x]) - 1
-            #         else:
-            #             y = y + 10
-            #     if x + 10 > len(da_seg_mask):
-            #         x = len(da_seg_mask) - 1
+                            if lateral >= -1 and lateral <= 1:
+                                # print(lateral)
+                                if lateral in [-1.0, -0.5, 0.0, 0.5, 1.0]:
+                                    if depth > max_depth:
+                                        max_depth = depth
             flag_message = Twist()
             if max_depth <= 30:
                 flag_message.linear.x = 1
@@ -144,19 +143,19 @@ class Detector:
                 flag_message.linear.x = 0
                 flag_message.linear.y = max_depth
             header = Header()
-            header.stamp = rospy.Time.now()    
+            header.stamp = rospy.Time.now()
             header.frame_id = 'ego_vehicle/rgb_front'
-            pc2 = point_cloud2.create_cloud(header, fields, points)
-            pc2.header.stamp = rospy.Time.now()
+
             print("Published")
-            self.callPublisher(image_detections, pc2, flag_message)
+            self.callPublisher(image_detections, flag_message)
+
             
 
-    def callPublisher(self, image, pcl2, flag_message):
+    def callPublisher(self, image, flag_message):
         '''
         the final publisher function
         '''
         segmented_image = self.bridge.cv2_to_imgmsg(image, 'bgr8')
         self.DetectionsPublisher.publish(segmented_image)
-        self.PC2Publisher.publish(pcl2)
+        # self.PC2Publisher.publish(pcl2)
         self.DAOPublisher.publish(flag_message)
