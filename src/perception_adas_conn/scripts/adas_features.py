@@ -33,17 +33,17 @@ class ADAS_Features:
             self.pub_topic_name, Twist, queue_size=1)
         
     def extractDataMOO(self, obj_data):
-        MOT_velocity = obj_data.object_state_dt
-        MOT_position = obj_data.position
+        self.MOT_velocity = obj_data.object_state_dt
+        self.MOT_position = obj_data.position
 
     def extractDataRoadSeg(self, seg_data):
-        go_flag = seg_data.linear.x
-        distance = seg_data.linear.y
+        self.go_flag = seg_data.linear.x
+        self.distance = seg_data.linear.y
 
     def extractEgoVehVelocity(self, odometry):
-        ego_velocity_x = odometry.twist.linear.x
-        ego_velocity_y = odometry.twist.linear.y
-        ego_velocity_angular = odometry.angular.z
+        self.ego_velocity_x = odometry.twist.linear.x
+        self.ego_velocity_y = odometry.twist.linear.y
+        self.ego_velocity_angular = odometry.angular.z
 
     def Algorithm(self):
         '''
