@@ -51,9 +51,9 @@ class ADAS_Features:
         dt = 0.1                    # set the resolution    
         error = numpy.zeros(100)
         error_y = numpy.zeros(100)
-        initial_rel_dist = 100
+        initial_rel_dist = min(extractDataMOO.MOT_position,extractDataRoadSeg.distance)
         initial_ego_vel = extractEgoVehVelocity.ego_velocity_x
-        initial_acc_set_speed = 10
+        initial_acc_set_speed = 20
         initial_ttc = initial_rel_dist/initial_ego_vel
         initial_ego_acc = 1
 
@@ -67,10 +67,11 @@ class ADAS_Features:
         for current_time in range(100):
             #print(current_time)
             # define the inputs to be taken from perception module 
+            aeb.MOO = aeb.MOO_Dist_Calc()
             rel_dist = aeb.MOO
 
             #ego_vel = None 
-            acc_set_speed = 10 
+            acc_set_speed = 20 
             #ttc = 50 - current_time*dt 
             #ego_acc = None 
             driver_brake = 0 
