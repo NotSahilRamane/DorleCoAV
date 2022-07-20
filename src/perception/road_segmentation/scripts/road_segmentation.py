@@ -7,7 +7,7 @@ import rospy
 from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import Image
 # from av_messages.msg import depthandimage
-
+from geometry_msgs.msg import Twist
 from YOLOP.tools.yolo_p import YOLOP_Class
 
 import torch
@@ -49,7 +49,9 @@ class Detector:
         rospy.loginfo("Published to topics")
         self.DetectionsPublisher = rospy.Publisher(
             self.pub_topic_name, Image, queue_size=1)
-        self.PC2Publisher = rospy.Publisher("/road/pointcloud", PointCloud2, queue_size=1)    
+        self.PC2Publisher = rospy.Publisher("/road/pointcloud", PointCloud2, queue_size=1)
+        self.DAOPublisher = rospy.Publisher("/road/deadahead", Twist, queue_size=1)    
+
 
     def storeImage(self, img): # Copy for Obj Detection
         if self.RGB_IMAGE_RECEIVED == 0:
@@ -113,33 +115,19 @@ class Detector:
                     PointField('y', 4, 7, 1),
                     PointField('z', 8, 7, 1),
                     PointField('intensity', 12, 7, 1)]
-            
-            # x, y = 0, 0
-            # while x < len(da_seg_mask):
-            #     while y < len(da_seg_mask[x]):
-            #         if da_seg_mask[x][y] == 1:
-            #             depth = depth_resized[x][y] # instead of x, y, give pixel coordinates of Bounding boxes
-            #             if depth <= 30.00:
-            #                 lateral = (y - CX) * depth / FX
-            #                 if lateral > -0.1 and lateral < 0.1:
-            #                     # print(lateral, depth)
-            #                     points.append((depth, lateral, 0, 1))
-            #                     print(x, y)
-            #         if y + 10 > len(da_seg_mask[x]):
-            #             y = len(da_seg_mask[x]) - 1
-            #         else:
-            #             y = y + 10
-            #     if x + 10 > len(da_seg_mask):
-            #         x = len(da_seg_mask) - 1
+            max_depth = 0
 
-            for x in range(0, len(da_seg_mask), 10):
-                for y in range(0, len(da_seg_mask[x]), 10):
+            for x in range(0, len(da_seg_mask), 2):
+                for y in range(0, len(da_seg_mask[x]), 2):
                     if da_seg_mask[x][y] == 1 or ll_seg_mask[x][y]:
                         depth = depth_resized[x][y] # instead of x, y, give pixel coordinates of Bounding boxes
+                        
                         if depth <= 30.00:
                             lateral = (y - CX) * depth / FX
-                            if lateral > -0.5 and lateral < 0.5:
+                            if lateral > -1 and lateral < 1:
                                 # print(lateral, depth)
+                                if depth > max_depth:
+                                    max_depth = depth
                                 points.append((depth, lateral, 0, 1))
                                 # print(x, y)
             #         if y + 10 > len(da_seg_mask[x]):
@@ -148,19 +136,27 @@ class Detector:
             #             y = y + 10
             #     if x + 10 > len(da_seg_mask):
             #         x = len(da_seg_mask) - 1
-                
+            flag_message = Twist()
+            if max_depth <= 15:
+                flag_message.linear.x = 1
+                flag_message.linear.y = max_depth
+            else:
+                flag_message.linear.x = 0
+                flag_message.linear.y = max_depth
             header = Header()
             header.stamp = rospy.Time.now()    
             header.frame_id = 'ego_vehicle/rgb_front'
             pc2 = point_cloud2.create_cloud(header, fields, points)
             pc2.header.stamp = rospy.Time.now()
             print("Published")
-            self.callPublisher(image_detections)
-            self.PC2Publisher.publish(pc2)
+            self.callPublisher(image_detections, pc2, flag_message)
+            
 
-    def callPublisher(self, image):
+    def callPublisher(self, image, pcl2, flag_message):
         '''
         the final publisher function
         '''
         segmented_image = self.bridge.cv2_to_imgmsg(image, 'bgr8')
         self.DetectionsPublisher.publish(segmented_image)
+        self.PC2Publisher.publish(pcl2)
+        self.DAOPublisher.publish(flag_message)
