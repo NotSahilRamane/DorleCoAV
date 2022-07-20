@@ -48,7 +48,7 @@ class Detector:
         self.DetectionsPublisher = rospy.Publisher(
             self.pub_topic_name, Image, queue_size=1)
         self.PC2Publisher = rospy.Publisher("/road/pointcloud", PointCloud2, queue_size=1)
-
+    
     def storeImage(self, img): # Copy for Obj Detection
         if self.RGB_IMAGE_RECEIVED == 0:
             try:
