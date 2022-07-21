@@ -7,6 +7,7 @@ from av_messages.msg import object
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from carla_msgs.msg import CarlaEgoVehicleStatus 
+# from geometry_msgs.msg import Accel
 
 class ADAS_Features:
     def __init__(self):
@@ -16,8 +17,8 @@ class ADAS_Features:
 
     def subscribeToTopics(self):
         rospy.loginfo('Subscribed to topics')
-        rospy.Subscriber(self.MOT_object_topicname, object,
-                        self.extractDataMOO, queue_size=1)
+        rospy.Subscriber(self.MIO_object_topicname, object,
+                        self.extractDataMIO, queue_size=1)
         rospy.Subscriber(self.road_seg_topicname, Twist,
                         self.extractDataRoadSeg, queue_size=1)
         rospy.Subscriber(self.ego_veh_velocity_topicname, Odometry,
@@ -28,11 +29,11 @@ class ADAS_Features:
 # MIO: MOST IMPORTANT OBJECT
 
     def loadParameters(self):
-        self.MOO_object_topicname = rospy.get_param("")
-        self.road_seg_topicname = rospy.get_param("")
-        self.ego_veh_velocity_topicname = rospy.get_param("")
-        self.getAccel_topicname = rospy.get_param("")
-        self.pub_topic_name = rospy.get_param("") 
+        self.MIO_object_topicname = rospy.get_param("road/mio", "/road/mio") # To be taken from Sahil
+        self.road_seg_topicname = rospy.get_param("road/lookahead", "/road/lookahead") # To be taken from Sahil
+        self.ego_veh_velocity_topicname = rospy.get_param("perception_adas_conn/ego_velocity","/carla/ego_vehicle/odometry")
+        self.getAccel_topicname = rospy.get_param("perception_adas_conn/ego_accel", "/carla/ego_vehicle/vehicle_status")
+        self.pub_topic_name = rospy.get_param("perception_adas_conn/adas_features_control", "/vehicle/controls") 
     
     def publishToTopics(self):
         rospy.loginfo("Published to topics")
@@ -48,12 +49,12 @@ class ADAS_Features:
         self.distance = seg_data.linear.y
 
     def extractEgoVehVelocity(self, odometry):
-        self.ego_velocity_x = odometry.twist.linear.x
+        self.ego_velocity_x = odometry.twist.linear.x # an extra twist might be req.
         self.ego_velocity_y = odometry.twist.linear.y
         self.ego_velocity_angular = odometry.angular.z
 
     def getAccel(self, acceleration):
-        self.acceleration = acceleration.Accel.linear.x
+        self.acceleration = acceleration.Accel.linear.x # check if Accel is necessary
 
     def Algorithm(self):
         # inputs and parameters before simulation starts 
@@ -122,3 +123,4 @@ class ADAS_Features:
 # object - velocity, pos
 # road-seg - geometry/twist
 # vehicle_velot - odometry
+# vehicle_accel - CarlaVehicleStatus/Accel
