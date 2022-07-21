@@ -29,8 +29,8 @@ class ADAS_Features:
 # MIO: MOST IMPORTANT OBJECT
 
     def loadParameters(self):
-        self.MIO_object_topicname = rospy.get_param("road/mio", "/road/mio") # To be taken from Sahil
-        self.road_seg_topicname = rospy.get_param("road/lookahead", "/road/lookahead") # To be taken from Sahil
+        self.MIO_object_topicname = rospy.get_param("road/mio", "/road/mio") 
+        self.road_seg_topicname = rospy.get_param("road/lookahead", "/road/lookahead") 
         self.ego_veh_velocity_topicname = rospy.get_param("perception_adas_conn/ego_velocity","/carla/ego_vehicle/odometry")
         self.getAccel_topicname = rospy.get_param("perception_adas_conn/ego_accel", "/carla/ego_vehicle/vehicle_status")
         self.pub_topic_name = rospy.get_param("perception_adas_conn/adas_features_control", "/vehicle/controls") 
