@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import numpy as np
 import rospy
 
 from av_messages.msg import object
@@ -24,8 +25,10 @@ class ADAS_Features:
         rospy.Subscriber(self.getAccel_topicname, CarlaEgoVehicleStatus,
                         self.getAccel, queue_size=1)
 
+# MIO: MOST IMPORTANT OBJECT
+
     def loadParameters(self):
-        self.MOT_object_topicname = rospy.get_param("")
+        self.MOO_object_topicname = rospy.get_param("")
         self.road_seg_topicname = rospy.get_param("")
         self.ego_veh_velocity_topicname = rospy.get_param("")
         self.getAccel_topicname = rospy.get_param("")
@@ -36,9 +39,9 @@ class ADAS_Features:
         self.ControlsPublisher = rospy.Publisher(
             self.pub_topic_name, Twist, queue_size=1)
         
-    def extractDataMOO(self, obj_data):
-        self.MOT_velocity = obj_data.object_state_dt
-        self.MOT_position = obj_data.position
+    def extractDataMIO(self, obj_data):
+        self.MIO_velocity = obj_data.object_state_dt
+        self.MIO_position = obj_data.position
 
     def extractDataRoadSeg(self, seg_data):
         self.go_flag = seg_data.linear.x
@@ -56,10 +59,10 @@ class ADAS_Features:
         # inputs and parameters before simulation starts 
         end_time = 10             # set simulation end time
         dt = 0.1                    # set the resolution    
-        error = numpy.zeros(100)
-        error_y = numpy.zeros(100)
-        initial_rel_dist = min(extractDataMOO.MOT_position,extractDataRoadSeg.distance)
-        initial_ego_vel = extractEgoVehVelocity.ego_velocity_x
+        error = np.zeros(100)
+        error_y = np.zeros(100)
+        initial_rel_dist = min(self.MIO_position, self.distance)
+        initial_ego_vel = self.ego_velocity_x
         initial_acc_set_speed = 20
         initial_ttc = initial_rel_dist/initial_ego_vel
         initial_ego_acc = 1
