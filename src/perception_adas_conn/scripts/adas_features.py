@@ -7,11 +7,13 @@ from av_messages.msg import object
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from carla_msgs.msg import CarlaEgoVehicleStatus 
+from adas_features import AEB_Controller
 # from geometry_msgs.msg import Accel
 
 class ADAS_Features:
     def __init__(self):
         self.loadParameters()
+        self.time_step = 0
         # self.bridge = CvBridge()
 
 
@@ -59,9 +61,10 @@ class ADAS_Features:
     def Algorithm(self):
         # inputs and parameters before simulation starts 
         end_time = 10             # set simulation end time
-        dt = 0.1                    # set the resolution    
-        error = np.zeros(100)
-        error_y = np.zeros(100)
+        dt = 0.1                    # get from ROS   
+        self.time_step += 1
+        # error = np.zeros(100)
+        # error_y = np.zeros(100)
         initial_rel_dist = min(self.MIO_position, self.distance)
         initial_ego_vel = self.ego_velocity_x
         initial_acc_set_speed = 20
