@@ -58,6 +58,7 @@ class DeepSORT:
 
     def do_object_detection(self, img_in):
         t1 = time.time()
+        img_in = cv2.resize(img_in, (640, 640))
         boxes, scores, classes, nums = self.yolo.object_detection(img_in, visualise = False)
         boxes = np.array([boxes]) 
         classes = classes[0]
@@ -117,20 +118,20 @@ class DeepSORT:
                     thickness = int(np.sqrt(64/float(j+1))*2)
                     cv2.line(img_in, (self.pts[track.track_id][j-1]), (self.pts[track.track_id][j]), color, thickness)
 
-                height, width, _ = img_in.shape
-                cv2.line(img_in, (0, int(3*height/6+height/20)), (width, int(3*height/6+height/20)), (0, 255, 0), thickness=2)
-                cv2.line(img_in, (0, int(3*height/6-height/20)), (width, int(3*height/6-height/20)), (0, 255, 0), thickness=2)
+            #     height, width, _ = img_in.shape
+            #     cv2.line(img_in, (0, int(3*height/6+height/20)), (width, int(3*height/6+height/20)), (0, 255, 0), thickness=2)
+            #     cv2.line(img_in, (0, int(3*height/6-height/20)), (width, int(3*height/6-height/20)), (0, 255, 0), thickness=2)
 
-                center_y = int(((bbox[1])+(bbox[3]))/2)
+            #     center_y = int(((bbox[1])+(bbox[3]))/2)
 
-                if center_y <= int(3*height/6+height/20) and center_y >= int(3*height/6-height/20):
-                    if class_name == 'car' or class_name == 'truck':
-                        self.counter.append(int(track.track_id))
-                        current_count += 1
+            #     if center_y <= int(3*height/6+height/20) and center_y >= int(3*height/6-height/20):
+            #         if class_name == 'car' or class_name == 'truck':
+            #             self.counter.append(int(track.track_id))
+            #             current_count += 1
 
-            total_count = len(set(self.counter))
-            cv2.putText(img_in, "Current Vehicle Count: " + str(current_count), (0, 80), 0, 1, (0, 0, 255), 2)
-            cv2.putText(img_in, "Total Vehicle Count: " + str(total_count), (0,130), 0, 1, (0,0,255), 2)
+            # total_count = len(set(self.counter))
+            # cv2.putText(img_in, "Current Vehicle Count: " + str(current_count), (0, 80), 0, 1, (0, 0, 255), 2)
+            # cv2.putText(img_in, "Total Vehicle Count: " + str(total_count), (0,130), 0, 1, (0,0,255), 2)
 
 
             fps = 1./(time.time()-t1)
@@ -139,7 +140,7 @@ class DeepSORT:
         return img_in, center_arr
 
 
-# vid = cv2.VideoCapture('/home/reuben/Projects/DorleCoAV/src/perception/road_segmentation/scripts/Tracking_DeepSORT/data/video/MOT16-13-raw.webm')
+# vid = cv2.VideoCapture('/home/reuben/Projects/DorleCoAV/src/perception/object_tracking/scripts/Tracking_DeepSORT/data/video/test.mp4')
 
 # deepsort = DeepSORT()
 # while True:
@@ -148,7 +149,7 @@ class DeepSORT:
 #         print('Completed')
 #         break
     
-#     img = cv2.resize(img, (640,640)) # We resize to (640, 640) since YOLOv5 was trained on this shape
+#     # img = cv2.resize(img, (640,640)) # We resize to (640, 640) since YOLOv5 was trained on this shape
 #     img_copy = np.copy(img)
 #     img_out, c = deepsort.do_object_detection(img_copy)
 #     print(c)

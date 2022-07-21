@@ -5,6 +5,7 @@ import rospy
 from av_messages.msg import object
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
+from carla_msgs.msg import CarlaEgoVehicleStatus 
 
 class ADAS_Features:
     def __init__(self):
@@ -17,14 +18,17 @@ class ADAS_Features:
         rospy.Subscriber(self.MOT_object_topicname, object,
                         self.extractDataMOO, queue_size=1)
         rospy.Subscriber(self.road_seg_topicname, Twist,
-                        self.callback1, queue_size=1)
+                        self.extractDataRoadSeg, queue_size=1)
         rospy.Subscriber(self.ego_veh_velocity_topicname, Odometry,
-                        self.callback2, queue_size=1)
+                        self.extractEgoVehVelocity, queue_size=1)
+        rospy.Subscriber(self.getAccel_topicname, CarlaEgoVehicleStatus,
+                        self.getAccel, queue_size=1)
 
     def loadParameters(self):
         self.MOT_object_topicname = rospy.get_param("")
         self.road_seg_topicname = rospy.get_param("")
         self.ego_veh_velocity_topicname = rospy.get_param("")
+        self.getAccel_topicname = rospy.get_param("")
         self.pub_topic_name = rospy.get_param("") 
     
     def publishToTopics(self):
@@ -44,6 +48,9 @@ class ADAS_Features:
         self.ego_velocity_x = odometry.twist.linear.x
         self.ego_velocity_y = odometry.twist.linear.y
         self.ego_velocity_angular = odometry.angular.z
+
+    def getAccel(self, acceleration):
+        self.acceleration = acceleration.Accel.linear.x
 
     def Algorithm(self):
         '''
