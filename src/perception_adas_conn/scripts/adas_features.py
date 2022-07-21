@@ -53,9 +53,63 @@ class ADAS_Features:
         self.acceleration = acceleration.Accel.linear.x
 
     def Algorithm(self):
-        '''
-        Add algorithm related fns here
-        '''
+        # inputs and parameters before simulation starts 
+        end_time = 10             # set simulation end time
+        dt = 0.1                    # set the resolution    
+        error = numpy.zeros(100)
+        error_y = numpy.zeros(100)
+        initial_rel_dist = min(extractDataMOO.MOT_position,extractDataRoadSeg.distance)
+        initial_ego_vel = extractEgoVehVelocity.ego_velocity_x
+        initial_acc_set_speed = 20
+        initial_ttc = initial_rel_dist/initial_ego_vel
+        initial_ego_acc = 1
+
+        # initialise an object at the beginning of the simulation. 
+        # same object keeps on updating as the simulation runs          
+        aeb = AEB_Controller(initial_rel_dist, initial_ego_vel, initial_acc_set_speed, initial_ttc, initial_ego_acc)
+        ego_vel = initial_ego_vel
+        ego_acc = initial_ego_acc
+        # all the code below goes in a for or while loop with iterator as "current_time"
+        ############
+        for current_time in range(100):
+            #print(current_time)
+            # define the inputs to be taken from perception module 
+            aeb.MOO = aeb.MOO_Dist_Calc()
+            rel_dist = aeb.MOO
+
+            #ego_vel = None 
+            acc_set_speed = 20 
+            #ttc = 50 - current_time*dt 
+            #ego_acc = None 
+            driver_brake = 0 
+
+            print(rel_dist, ttc)
+
+
+            # update the aeb attributes using the above inputs 
+            aeb.relative_dist = rel_dist
+            aeb.ego_vel = ego_vel
+            aeb.ACC_set_speed = acc_set_speed
+            aeb.ttc = rel_dist/ego_vel
+            aeb.ego_acc = ego_acc  
+
+            # perform the functions using the updated attributes
+            # other attributes will get updated as the function runs
+            aeb.stop_bool = aeb.TTC_non_positive()
+            aeb.FCW_Stopping_Time = aeb.stopping_time()
+            aeb.PB1_Stopping_Time, aeb.PB2_Stopping_Time, aeb.FB_Stopping_Time = aeb.stopping_time_calc()
+            acc_acceleration = aeb.acc_controller(current_time)
+            aeb_deceleration, aeb_status, fcw_status = aeb.AEB_state_machine()
+
+            brakecontrol = Brake_Control(acc_acceleration, aeb_deceleration, driver_brake)
+            brake_command = brakecontrol.final_decel()
+            throttle = Throttle_control(aeb_status, acc_acceleration)
+            throttle_command = throttle.switch()
+            ego_acc = throttle_command
+            ego_vel += (throttle_command )*dt
+
+            print("brake = {}".format(brake_command))
+            print("throttle = {}".format(throttle_command))
         controls = 1.0 # just for the time being
         self.callPublisher(controls)
 
