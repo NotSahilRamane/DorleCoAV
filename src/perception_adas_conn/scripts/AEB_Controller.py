@@ -43,6 +43,14 @@ class AEB_Controller:
         self.ACC_state = 1
         self.ACC_enable = 1
         self.AEB_state = "Default"
+
+        # inputs and parameters before simulation starts 
+        # set simulation end time
+        dt = 0.1                    # get from ROS   
+        initial_rel_dist = min(self.MIO_position, self.distance)
+        initial_ego_vel = self.ego_velocity_x
+        initial_acc_set_speed = 20
+        
         
         
 
