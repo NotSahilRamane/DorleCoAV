@@ -10,13 +10,13 @@ import matplotlib.pyplot as plt
 
 ######################################################################################
 class AEB_Controller:
-    def __init__(self, relative_dist, ego_vel, ACC_set_speed, ttc, ego_acc):
+    def __init__(self):
         # used for definition
-        self.relative_dist = relative_dist
-        self.ego_vel = ego_vel
-        self.ACC_set_speed = ACC_set_speed
-        self.ttc = ttc
-        self.ego_acc = ego_acc
+#         self.relative_dist = relative_dist
+#         self.ego_vel = ego_vel
+#         self.ACC_set_speed = ACC_set_speed
+#         self.ttc = ttc
+#         self.ego_acc = ego_acc
         # parameters which we won't need outside the aeb block --- constants
         self.AEB_PB1 = 2
         self.AEB_PB2 = 3
@@ -30,6 +30,12 @@ class AEB_Controller:
         self.FCW_Driver_Deacc = 4
         self.acceleration = 0
         # parameters  which keep on updated every iteration
+        self.previous_error = 0                                  # error value for the previous time step 
+        self.previous_error_y = 0                                # error in distance for the previous time step
+        self.I_previous = 0                                      # I value for the previous time step  
+        self.I_previous_y = 0                                    # I_y value for the previous time step
+        self.I = 0                                               # I value for the current time step 
+        self.I_y = 0                                             # initial value of distance error
         self.FCW_Stopping_Time = inf
         self.PB1_Stopping_Time = inf
         self.PB2_Stopping_Time = inf
@@ -62,59 +68,74 @@ class AEB_Controller:
             self.stop_bool = False
         return self.stop_bool
 
-    def PID(self, error, current_time):  
-        I = 0  
+    def PID(self, error, dt):  
         control_var = 0                                
-        for i in range(currend_time = 10             # set simulation end time
-        dt = 0.1                    # get from ROS   
-        self.time_step += 1ent_time):           
+        #dt = 0.1                    # get from ROS   
+        #self.time_step += ent_time           
             #print("i = {}. type = {}".format(i, type(i)))
             #print(error[i])
-            P = (self.Kp)*error[i]
-            I = I + (self.Ki)*error[i]*dt           
-            D = (self.Kd)*(error[i]-error[i-1])/dt   
-
-            control_var = P + I + D
+        P = (self.Kp)*error
+        self.I = self.I_previous + (self.Ki)*error*dt           
+        D = (self.Kd)*(error-self.previous_error)/dt   
+        control_var = P + self.I + D
         return control_var
 
-    def calculate_error(self, control, setpoint):
-        self.error = setpoint - control
+    def PID_distance(self, error_y, dt):
+        control_var_y = 0                                
+        #dt = 0.1                    # get from ROS   
+        #self.time_step += ent_time           
+            #print("i = {}. type = {}".format(i, type(i)))
+            #print(error[i])
+        P_y = (self.Kp)*error_y
+        self.I = self.I_previous_y + (self.Ki)*error_y*dt           
+        D_y = (self.Kd)*(error_y-self.previous_error_y)/dt   
+        control_var_y = P_y + self.I_y + D_y
+        return control_var_y
+        
+    
+    #def calculate_error(self, control, setpoint):
+    #    self.error = setpoint - control
 
-    def acc_controller(self, current_time):
-        ACC_acc = 0
-        self.velocity_offset = self.ACC_set_speed - self.ego_vel
-        error[current_time] = self.velocity_offset
-        self.velocity_offset_controlled = self.PID(error, current_time)
-        sd = (2*self.ego_vel)+self.min_def_dist                             
-        y = self.relative_dist - sd
-        error_y[current_time] = y
-
-        if self.ACC_state == 1 and y <= 0:                                                                  
-            self.ACC_state = 2
-        elif self.ACC_state == 2 and (y >= 0.2*sd and j > 100):                       
-            self.ACC_state = 1
-        elif self.ACC_state == 2 and (y <= 0 and j > 100):
-            self.ACC_state = 3
-        elif self.ACC_state == 3 and y >= 0.2*sd:
-            self.ACC_state = 2
-
-        if self.ACC_state == 1:
-            ACC_acc = self.PID(error, current_time)
-        elif self.ACC_state == 2:
-            for j in range(1, 101):
-                j += 1
-                self.ACC_state += 0.05
-        elif self.ACC_state == 3:
-            ACC_acc = self.PID(error_y, current_time)
-
-        if ACC_acc > 1:
-            ACC_acc = 1
-        elif ACC_acc < -0:
-            ACC_acc = 0
-
+    def acc_controller(self):
+        
         if self.ACC_enable > 0:
+            ACC_acc = 0
+            self.velocity_offset = self.ACC_set_speed - self.ego_vel
+            error = self.velocity_offset
+            sd = (2*self.ego_vel)+self.min_def_dist                             
+            y = self.relative_dist - sd
+            error_y = y
+
+            if self.ACC_state == 1 and y <= 0:                                                                  
+                self.ACC_state = 2
+            elif self.ACC_state == 2 and (y >= 0.2*sd and j > 100):                       
+                self.ACC_state = 1
+            elif self.ACC_state == 2 and (y <= 0 and j > 100):
+                self.ACC_state = 3
+            elif self.ACC_state == 3 and y >= 0.2*sd:
+                self.ACC_state = 2
+
+            if self.ACC_state == 1:
+                ACC_acc = self.PID(error, dt)
+                self.previous_error = error
+            elif self.ACC_state == 2:
+                for j in range(1, 101):
+                    j += 1
+                    self.previous_error = self.ACC_set_speed - self.ego_vel
+                    self.previous_error_y = self.relative_dist - (2*self.ego_vel)+self.min_def_dist
+                    self.ACC_state += 0.05
+            elif self.ACC_state == 3:
+                ACC_acc = self.PID_distance(error_y, dt)
+                self.previous_error_y = error_y
+
+            if ACC_acc > 1:
+                ACC_acc = 1
+            elif ACC_acc < -0:
+                ACC_acc = 0
             self.acceleration = ACC_acc
         else:
+            self.velocity_offset_controlled = self.PID(error, dt)
+            self.previous_error = error
             self.acceleration = self.velocity_offset_controlled
 
         return self.acceleration
@@ -181,9 +202,33 @@ class AEB_Controller:
             a1 = 0
             return a1, a2, a3
     
-    def MOO_Dist_Calc(self):
-        dist_MOO = min(features.extractDataMOO.MOT_position,features.extractDataRoadSeg.distance)
-        return dist_MOO
+        
+    def get_controls(self, relative_dist, ego_vel, ACC_set_speed, ttc, ego_acc, driver_brake, dt):
+        self.relative_dist = relative_dist
+        self.ego_vel = ego_vel
+        self.ACC_set_speed = ACC_set_speed
+        self.ttc = ttc
+        self.ego_acc = ego_acc
+        self.ACC_enable = int((ACC_set_speed > 0))
+        # perform the functions using the updated attributes
+        # other attributes will get updated as the function runs
+        self.stop_bool = self.TTC_non_positive()
+        self.FCW_Stopping_Time = self.stopping_time()
+        self.PB1_Stopping_Time, self.PB2_Stopping_Time, self.FB_Stopping_Time = self.stopping_time_calc()
+        acc_acceleration = self.acc_controller()
+        aeb_deceleration, aeb_status, fcw_status = self.AEB_state_machine()
+        brakecontrol = Brake_Control(acc_acceleration, aeb_deceleration, driver_brake)
+        brake_command = brakecontrol.final_decel()
+        throttle = Throttle_control(aeb_status, acc_acceleration)
+        throttle_command = throttle.switch()
+        #ego_acc = throttle_command
+        #ego_vel += (throttle_command )*dt
+        
+        return brake_command, throttle_command
+        
+    
+        
+        
     
 
 ############################################################################
@@ -194,8 +239,7 @@ class Brake_Control:
         self.deceleration = deceleration
         self.driver_brake = driver_brake
         self.brake = 2
-
-          
+     
     def final_decel(self):
         if self.ACC_deacc > 0:
             self.ACC_deacc = self.ACC_deacc
@@ -237,68 +281,7 @@ class Throttle_control:
         return self.throttle
 ##########################################################################################
 
-####################################################################
-############   Main function ###########
-####################################################################
 
-if __name__ == '__main__':
-
-    # inputs and parameters before simulation starts 
-    end_time = 10             # set simulation end time
-    dt = 0.1                    # set the resolution    
-    error = numpy.zeros(100)
-    error_y = numpy.zeros(100)
-    initial_rel_dist = 100
-    initial_ego_vel = 0
-    initial_acc_set_speed = 10
-    initial_ttc = 50
-    initial_ego_acc = 1
-
-    # initialise an object at the beginning of the simulation. 
-    # same object keeps on updating as the simulation runs          
-    aeb = AEB_Controller(initial_rel_dist, initial_ego_vel, initial_acc_set_speed, initial_ttc, initial_ego_acc)
-    ego_vel = initial_ego_vel
-    ego_acc = initial_ego_acc
-    # all the code below goes in a for or while loop with iterator as "current_time"
-    ############
-    for current_time in range(100):
-        #print(current_time)
-        # define the inputs to be taken from perception module 
-        rel_dist = aeb.MOO 
-        
-        #ego_vel = None 
-        acc_set_speed = 10 
-        ttc = 50 - current_time*dt 
-        #ego_acc = None 
-        driver_brake = 0 
-        
-        print(rel_dist, ttc)
-    
-
-        # update the aeb attributes using the above inputs 
-        aeb.relative_dist = rel_dist
-        aeb.ego_vel = ego_vel
-        aeb.ACC_set_speed = acc_set_speed
-        aeb.ttc = ttc
-        aeb.ego_acc = ego_acc  
-
-        # perform the functions using the updated attributes
-        # other attributes will get updated as the function runs
-        aeb.stop_bool = aeb.TTC_non_positive()
-        aeb.FCW_Stopping_Time = aeb.stopping_time()
-        aeb.PB1_Stopping_Time, aeb.PB2_Stopping_Time, aeb.FB_Stopping_Time = aeb.stopping_time_calc()
-        acc_acceleration = aeb.acc_controller(current_time)
-        aeb_deceleration, aeb_status, fcw_status = aeb.AEB_state_machine()
-                        
-        brakecontrol = Brake_Control(acc_acceleration, aeb_deceleration, driver_brake)
-        brake_command = brakecontrol.final_decel()
-        throttle = Throttle_control(aeb_status, acc_acceleration)
-        throttle_command = throttle.switch()
-        ego_acc = throttle_command
-        ego_vel += (throttle_command )*dt
-
-        print("brake = {}".format(brake_command))
-        print("throttle = {}".format(throttle_command))
     
 
 
