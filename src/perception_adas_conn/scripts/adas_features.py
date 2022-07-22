@@ -15,7 +15,6 @@ class ADAS_Features:
         self.loadParameters()
         self.time_step = 0
         # self.bridge = CvBridge()
-        _, _, _, _, _ = self.getAEBParams()
         self.aeb = AEB_Controller()
 
 
@@ -31,7 +30,17 @@ class ADAS_Features:
                         self.getAccel, queue_size=1)
 
     def getAEBParams(self):
-        pass
+        v1 = min(self.distance, self.MIO_position)
+        v2 = self.MIO_velocity
+        v3 = 20                                                  # constant for now should change later 
+        if v2 != 0:
+            v4 = v1/v2
+        else:
+            v4 = inf
+        v5 = self.acceleration
+        v6 = driver_brake
+        v7 = dt
+        return v1, v2, v3, v4, v5, v6, v7
 
 # MIO: MOST IMPORTANT OBJECT
 
@@ -63,9 +72,9 @@ class ADAS_Features:
     def getAccel(self, acceleration):
         self.acceleration = acceleration.Accel.linear.x # check if Accel is necessary
 
-    def Algorithm(self, setpoint, error):
-
-        controls = self.aeb.get_controls(setpoint, error)
+    def Algorithm(self):
+        relative_dist, ego_vel, ACC_set_speed, ttc, ego_acc, driver_brake, dt = self.getAEBParams()
+        controls = self.aeb.get_controls()
         self.callPublisher(controls)
 
     def callPublisher(self, controls):
