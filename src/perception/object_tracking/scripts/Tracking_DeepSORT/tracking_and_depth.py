@@ -28,9 +28,9 @@ from Tracking_DeepSORT.deep_sort.yoloV5 import YOLO_Fast
 
 class DeepSORT:
 
-    def __init__(self, class_names_file='/home/reuben/Projects/DorleCoAV/src/perception/road_segmentation/scripts/Tracking_DeepSORT/data/labels/coco.names', 
-    yolo_model='/home/reuben/Projects/DorleCoAV/src/perception/road_segmentation/scripts/Tracking_DeepSORT/deep_sort/onnx_models/yolov5s.onnx',
-    model_filename='/home/reuben/Projects/DorleCoAV/src/perception/road_segmentation/scripts/Tracking_DeepSORT/model_data/mars-small128.pb', visualize=True):
+    def __init__(self, class_names_file='/home/sahil/DorleCoAV/src/perception/road_segmentation/scripts/Tracking_DeepSORT/data/labels/coco.names', 
+    yolo_model='/home/sahil/DorleCoAV/src/perception/road_segmentation/scripts/Tracking_DeepSORT/deep_sort/onnx_models/yolov5s.onnx',
+    model_filename='/home/sahil/DorleCoAV/src/perception/road_segmentation/scripts/Tracking_DeepSORT/model_data/mars-small128.pb', visualize=True):
 
         self.class_names = [c.strip() for c in open(os.path.abspath(class_names_file)).readlines()]
         self.yolo = YOLO_Fast(sc_thresh=.5, nms_thresh=.45, cnf_thresh=.45, model=yolo_model)
@@ -90,6 +90,7 @@ class DeepSORT:
             # looping over each tracked obstacle
             center_arr = []
             for track in self.tracker.tracks:
+                
                 # if the track has not been confirmed yet, has not been updated for more than 1 frame, skip it.
                 if not track.is_confirmed() or track.time_since_update >1:
                     continue
@@ -97,44 +98,45 @@ class DeepSORT:
                 bbox = track.to_tlbr()
                 # extract the tracks class using the get_class() method
                 class_name = track.get_class()
-                color = self.colors[int(track.track_id) % len(self.colors)]
-                color = [i * 255 for i in color]
+                if class_name == 'car' or class_name == 'truck':
+                    color = self.colors[int(track.track_id) % len(self.colors)]
+                    color = [i * 255 for i in color]
 
-                # visualization
-                cv2.rectangle(img_in, (int(bbox[0]),int(bbox[1])), (int(bbox[2]),int(bbox[3])), color, 2)
-                cv2.rectangle(img_in, (int(bbox[0]), int(bbox[1]-30)), (int(bbox[0])+(len(class_name)
-                    +len(str(track.track_id)))*17, int(bbox[1])), color, -1)
-                cv2.putText(img_in, class_name+"-"+str(track.track_id), (int(bbox[0]), int(bbox[1]-10)), 0, 0.75,
-                    (255, 255, 255), 2)
+                    # visualization
+                    cv2.rectangle(img_in, (int(bbox[0]),int(bbox[1])), (int(bbox[2]),int(bbox[3])), color, 2)
+                    cv2.rectangle(img_in, (int(bbox[0]), int(bbox[1]-30)), (int(bbox[0])+(len(class_name)
+                        +len(str(track.track_id)))*17, int(bbox[1])), color, -1)
+                    cv2.putText(img_in, class_name+"-"+str(track.track_id), (int(bbox[0]), int(bbox[1]-10)), 0, 0.75,
+                        (255, 255, 255), 2)
 
-                center = (int(((bbox[0]) + (bbox[2]))/2), int(((bbox[1])+(bbox[3]))/2))
-                center_arr.append(center)
-                self.pts[track.track_id].append(center)
+                    center = (int(((bbox[0]) + (bbox[2]))/2), int(((bbox[1])+(bbox[3]))/2), track.track_id)
+                    center_arr.append(center)
+                    self.pts[track.track_id].append(center)
 
-                for j in range(1, len(self.pts[track.track_id])):
-                    if self.pts[track.track_id][j-1] is None or self.pts[track.track_id][j] is None:
-                        continue
-                    thickness = int(np.sqrt(64/float(j+1))*2)
-                    cv2.line(img_in, (self.pts[track.track_id][j-1]), (self.pts[track.track_id][j]), color, thickness)
+                    for j in range(1, len(self.pts[track.track_id])):
+                        if self.pts[track.track_id][j-1] is None or self.pts[track.track_id][j] is None:
+                            continue
+                        thickness = int(np.sqrt(64/float(j+1))*2)
+                        cv2.line(img_in, (self.pts[track.track_id][j-1]), (self.pts[track.track_id][j]), color, thickness)
 
-                height, width, _ = img_in.shape
-                cv2.line(img_in, (0, int(3*height/6+height/20)), (width, int(3*height/6+height/20)), (0, 255, 0), thickness=2)
-                cv2.line(img_in, (0, int(3*height/6-height/20)), (width, int(3*height/6-height/20)), (0, 255, 0), thickness=2)
+                    height, width, _ = img_in.shape
+                    cv2.line(img_in, (0, int(3*height/6+height/20)), (width, int(3*height/6+height/20)), (0, 255, 0), thickness=2)
+                    cv2.line(img_in, (0, int(3*height/6-height/20)), (width, int(3*height/6-height/20)), (0, 255, 0), thickness=2)
 
-                center_y = int(((bbox[1])+(bbox[3]))/2)
+                    center_y = int(((bbox[1])+(bbox[3]))/2)
 
-                if center_y <= int(3*height/6+height/20) and center_y >= int(3*height/6-height/20):
-                    if class_name == 'car' or class_name == 'truck':
-                        self.counter.append(int(track.track_id))
-                        current_count += 1
+                    if center_y <= int(3*height/6+height/20) and center_y >= int(3*height/6-height/20):
+                        if class_name == 'car' or class_name == 'truck':
+                            self.counter.append(int(track.track_id))
+                            current_count += 1
 
-            total_count = len(set(self.counter))
-            cv2.putText(img_in, "Current Vehicle Count: " + str(current_count), (0, 80), 0, 1, (0, 0, 255), 2)
-            cv2.putText(img_in, "Total Vehicle Count: " + str(total_count), (0,130), 0, 1, (0,0,255), 2)
+                total_count = len(set(self.counter))
+                cv2.putText(img_in, "Current Vehicle Count: " + str(current_count), (0, 80), 0, 1, (0, 0, 255), 2)
+                cv2.putText(img_in, "Total Vehicle Count: " + str(total_count), (0,130), 0, 1, (0,0,255), 2)
 
 
-            fps = 1./(time.time()-t1)
-            cv2.putText(img_in, "FPS: {:.2f}".format(fps), (0,30), 0, 1, (0,0,255), 2)
+                fps = 1./(time.time()-t1)
+                cv2.putText(img_in, "FPS: {:.2f}".format(fps), (0,30), 0, 1, (0,0,255), 2)
 
         return img_in, center_arr
 
