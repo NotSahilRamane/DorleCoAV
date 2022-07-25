@@ -28,9 +28,9 @@ from Tracking_DeepSORT.deep_sort.yoloV5 import YOLO_Fast
 
 class DeepSORT:
 
-    def __init__(self, class_names_file='/home/sahil/DorleCoAV/src/perception/road_segmentation/scripts/Tracking_DeepSORT/data/labels/coco.names', 
-    yolo_model='/home/sahil/DorleCoAV/src/perception/road_segmentation/scripts/Tracking_DeepSORT/deep_sort/onnx_models/yolov5s.onnx',
-    model_filename='/home/sahil/DorleCoAV/src/perception/road_segmentation/scripts/Tracking_DeepSORT/model_data/mars-small128.pb', visualize=True):
+    def __init__(self, class_names_file='/home/dorleco/DorleCoAV/src/perception/road_segmentation/scripts/Tracking_DeepSORT/data/labels/coco.names', 
+    yolo_model='/home/dorleco/DorleCoAV/src/perception/road_segmentation/scripts/Tracking_DeepSORT/deep_sort/onnx_models/yolov5s.onnx',
+    model_filename='/home/dorleco/DorleCoAV/src/perception/road_segmentation/scripts/Tracking_DeepSORT/model_data/mars-small128.pb', visualize=True):
 
         self.class_names = [c.strip() for c in open(os.path.abspath(class_names_file)).readlines()]
         self.yolo = YOLO_Fast(sc_thresh=.5, nms_thresh=.45, cnf_thresh=.45, model=yolo_model)
@@ -89,6 +89,7 @@ class DeepSORT:
 
             # looping over each tracked obstacle
             center_arr = []
+            center_arr_toSend = []
             for track in self.tracker.tracks:
                 
                 # if the track has not been confirmed yet, has not been updated for more than 1 frame, skip it.
@@ -109,8 +110,11 @@ class DeepSORT:
                     cv2.putText(img_in, class_name+"-"+str(track.track_id), (int(bbox[0]), int(bbox[1]-10)), 0, 0.75,
                         (255, 255, 255), 2)
 
-                    center = (int(((bbox[0]) + (bbox[2]))/2), int(((bbox[1])+(bbox[3]))/2), track.track_id)
+                    center_toSend = (int(((bbox[0]) + (bbox[2]))/2), int(((bbox[1])+(bbox[3]))/2), track.track_id)
+                    center = (int(((bbox[0]) + (bbox[2]))/2), int(((bbox[1])+(bbox[3]))/2))
+
                     center_arr.append(center)
+                    center_arr_toSend.append(center_toSend)
                     self.pts[track.track_id].append(center)
 
                     for j in range(1, len(self.pts[track.track_id])):
@@ -138,7 +142,7 @@ class DeepSORT:
                 fps = 1./(time.time()-t1)
                 cv2.putText(img_in, "FPS: {:.2f}".format(fps), (0,30), 0, 1, (0,0,255), 2)
 
-        return img_in, center_arr
+        return img_in, center_arr_toSend
 
 
 # vid = cv2.VideoCapture('/home/reuben/Projects/DorleCoAV/src/perception/road_segmentation/scripts/Tracking_DeepSORT/data/video/MOT16-13-raw.webm')
