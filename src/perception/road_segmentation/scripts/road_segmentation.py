@@ -116,11 +116,6 @@ class Detector:
             half_d = 0
             m_half_d = 0
             zero_d = 0
-
-            # fields = [PointField('x', 0, 7, 1),
-            #         PointField('y', 4, 7, 1),
-            #         PointField('z', 8, 7, 1),
-            #         PointField('intensity', 12, 7, 1)]
             max_depth = 0
             
             for x in range(0, len(da_seg_mask), 2):
@@ -128,7 +123,7 @@ class Detector:
                     if da_seg_mask[x][y] == 1 or ll_seg_mask[x][y]:
                         depth = depth_resized[x][y] # instead of x, y, give pixel coordinates of Bounding boxes
                         
-                        if depth <= 30.00:
+                        if depth <= 50.00:
                             lateral = (y - CX) * depth / FX
                             if lateral >= -1 and lateral <= 1:
                                 # print(lateral)
