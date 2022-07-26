@@ -3,7 +3,7 @@
 import numpy as np
 import rospy
 
-from av_messages.msg import object
+from av_messages.msg import object_
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from carla_msgs.msg import CarlaEgoVehicleStatus 
@@ -20,7 +20,7 @@ class ADAS_Features:
 
     def subscribeToTopics(self):
         rospy.loginfo('Subscribed to topics')
-        rospy.Subscriber(self.MIO_object_topicname, object,
+        rospy.Subscriber(self.MIO_object_topicname, object_,
                         self.extractDataMIO, queue_size=1)
         rospy.Subscriber(self.road_seg_topicname, Twist,
                         self.extractDataRoadSeg, queue_size=1)
