@@ -36,10 +36,10 @@ class AEB_Controller:
         self.I_previous_y = 0                                    # I_y value for the previous time step
         self.I = 0                                               # I value for the current time step 
         self.I_y = 0                                             # initial value of distance error
-        self.FCW_Stopping_Time = inf
-        self.PB1_Stopping_Time = inf
-        self.PB2_Stopping_Time = inf
-        self.FB_Stopping_Time = inf
+        self.FCW_Stopping_Time = float('inf')
+        self.PB1_Stopping_Time = float('inf')
+        self.PB2_Stopping_Time = float('inf')
+        self.FB_Stopping_Time = float('inf')
         self.stop_bool = False
         self.deacc = 0
         self.deacc1 = 1
@@ -59,17 +59,17 @@ class AEB_Controller:
 
         # inputs and parameters before simulation starts 
         # set simulation end time
-        dt = 0.1                    # get from ROS   
-        initial_rel_dist = min(self.MIO_position, self.distance)
-        initial_ego_vel = self.ego_velocity_x
-        initial_acc_set_speed = 20
+        # dt = 0.1                    # get from ROS   
+        # initial_rel_dist = min(self.MIO_position, self.distance)
+        # initial_ego_vel = self.ego_velocity_x
+        # initial_acc_set_speed = 20
         
         
         
 
     # check for ttc > 0        we don't need ttc for acc or cc we need it only for aeb 
     def TTC_non_positive(self):
-        if (self.ttc <= 0) or (self.ego_vel <= 0):
+        if (self.ttc <= 0) or (self.relative_vel <= 0):
             self.stop_bool = True
         else:
             self.stop_bool = False
@@ -103,11 +103,11 @@ class AEB_Controller:
     #def calculate_error(self, control, setpoint):
     #    self.error = setpoint - control
 
-    def acc_controller(self):
+    def acc_controller(self, dt):
         
         if self.ACC_enable > 0:
             ACC_acc = 0
-            self.velocity_offset = self.ACC_set_speed - self.ego_vel
+            self.velocity_offset = self.ACC_set_speed - self.relative_vel
             error = self.velocity_offset
             self.brake_distance = self.relative_vel**2 / 2*self.deacc1
             
@@ -147,13 +147,17 @@ class AEB_Controller:
         return self.acceleration, set_deacc_flag
 
     def stopping_time(self, relative_vel, relative_dist):
-        self.ttc = relative_dist/relative_vel
-        return self.ttc
+        try:
+            self.ttc = relative_dist/relative_vel
+            return self.ttc
+        except ZeroDivisionError:
+            self.ttc = float('inf')
+            return self.ttc
 
     def stopping_time_calc(self):
-        self.PB1_Stopping_Time = self.ego_vel/self.AEB_PB1
-        self.PB2_Stopping_Time = self.ego_vel/self.AEB_PB2
-        self.FB_Stopping_Time = self.ego_vel/self.AEB_FB
+        self.PB1_Stopping_Time = self.relative_vel/self.AEB_PB1
+        self.PB2_Stopping_Time = self.relative_vel/self.AEB_PB2
+        self.FB_Stopping_Time = self.relative_vel/self.AEB_FB
         return self.PB1_Stopping_Time, self.PB2_Stopping_Time, self.FB_Stopping_Time
 
     def AEB_state_machine(self):
@@ -218,9 +222,9 @@ class AEB_Controller:
         # perform the functions using the updated attributes
         # other attributes will get updated as the function runs
         self.stop_bool = self.TTC_non_positive()
-        self.FCW_Stopping_Time = self.stopping_time()
+        self.FCW_Stopping_Time = self.stopping_time(relative_vel, relative_dist)
         self.PB1_Stopping_Time, self.PB2_Stopping_Time, self.FB_Stopping_Time = self.stopping_time_calc()
-        acc_acceleration, set_deacc_flag = self.acc_controller()
+        acc_acceleration, set_deacc_flag = self.acc_controller(dt)
         aeb_deceleration, aeb_status, fcw_status = self.AEB_state_machine()
         if set_deacc_flag == 1:
             brakecontrol = Brake_Control(acc_acceleration, aeb_deceleration, driver_brake)

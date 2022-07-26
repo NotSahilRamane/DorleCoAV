@@ -2,6 +2,7 @@
 
 import numpy as np
 import rospy
+import math
 
 from av_messages.msg import object_
 from geometry_msgs.msg import Twist
@@ -15,6 +16,9 @@ class ADAS_Features:
         self.loadParameters()
         self.time_step = 0
         # self.bridge = CvBridge()
+        self.MIO_position = 0
+        self.MIO_DATA_RECEIVED = 0
+        self.ROAD_SEG_RECEIVED = 0
         self.aeb = AEB_Controller()
         self.prv_dt = rospy.get_time()
 
@@ -34,10 +38,10 @@ class ADAS_Features:
         relative_dist = min(self.drivable_distance, self.MIO_position)
         relative_vel = self.MIO_velocity
         ACC_set_speed = 20                                                  # constant for now should change later 
-        if ego_vel != 0:
+        if relative_vel != 0:
             ttc = relative_dist/relative_vel
         else:
-            ttc = inf
+            ttc = float('inf')
         ego_acc = self.acceleration
         driver_brake = 0
         dt = rospy.get_time() - self.prv_dt # add time stamps
@@ -48,7 +52,7 @@ class ADAS_Features:
 
     def loadParameters(self):
         self.MIO_object_topicname = rospy.get_param("road/mio", "/road/mio") 
-        self.road_seg_topicname = rospy.get_param("road/lookahead", "/road/lookahead") 
+        self.road_seg_topicname = rospy.get_param("road/deadahead", "/road/deadahead") 
         self.ego_veh_velocity_topicname = rospy.get_param("perception_adas_conn/ego_velocity","/carla/ego_vehicle/odometry")
         self.getAccel_topicname = rospy.get_param("perception_adas_conn/ego_accel", "/carla/ego_vehicle/vehicle_status")
         self.pub_topic_name = rospy.get_param("perception_adas_conn/adas_features_control", "/vehicle/controls") 
@@ -63,6 +67,8 @@ class ADAS_Features:
             self.MIO_velocity = obj_data.object_state_dt.y
             self.MIO_position = obj_data.position.y
             self.MIO_DATA_RECEIVED = 1
+            print("MIO Filled")
+
             self.sync_data()
 
     def extractDataRoadSeg(self, seg_data):
@@ -70,6 +76,7 @@ class ADAS_Features:
             self.go_flag = seg_data.linear.x ## FLAG in linear.x
             self.drivable_distance = seg_data.linear.y
             self.ROAD_SEG_RECEIVED = 1
+            print("Seg Filled")
             self.sync_data()
 
     def sync_data(self): # Copy for Obj Detection
@@ -77,26 +84,52 @@ class ADAS_Features:
             self.Algorithm()
             self.MIO_DATA_RECEIVED = 0
             self.ROAD_SEG_RECEIVED = 0
+        else:
+            print("Either Flag is Zero")
+            # if self.ROAD_SEG_RECEIVED == 1:
+            #     self.ROAD_SEG_RECEIVED = 0
+            # elif self.MIO_DATA_RECEIVED == 1:
+            #     self.MIO_DATA_RECEIVED = 0
+            # # self.MIO_DATA_RECEIVED = 0
+            # self.ROAD_SEG_RECEIVED = 0
 
     def extractEgoVehVelocity(self, odometry):
         self.ego_velocity_x = odometry.twist.twist.linear.x
         self.ego_velocity_y = odometry.twist.twist.linear.y
         self.ego_velocity_angular = odometry.pose.pose.orientation.z
+        # print("EGO VEL RECEIVED")
 
     def getAccel(self, acceleration):
         self.acceleration = acceleration.acceleration.linear.x
+        # print("EGO ACC RECEIVED")
 
     def Algorithm(self):
         control_message = Twist()
         relative_dist, relative_vel, ACC_set_speed, ttc, ego_acc, driver_brake, dt = self.getAEBParams()
         brake, throttle = self.aeb.get_controls(relative_dist, relative_vel, ACC_set_speed, ttc, ego_acc, driver_brake, dt)
+        # brake = self.stable_sigmoid(brake)
+        # throttle = self.stable_sigmoid(throttle)
+        brake, throttle = brake/2, throttle/2
+        print(brake, throttle)
         # Fill twist message here ###
         control_message.linear.x = throttle
         control_message.linear.y = brake
         self.callPublisher(control_message)
 
+    def stable_sigmoid(self, x):
+
+        if x >= 0:
+            z = math.exp(-x)
+            sig = 1 / (1 + z)
+            return sig
+        else:
+            z = math.exp(x)
+            sig = z / (1 + z)
+            return sig
+
     def callPublisher(self, controls):
         self.ControlsPublisher.publish(controls)
+        print("Published AEB Message")
 
 # object - velocity, pos
 # road-seg - geometry/twist
