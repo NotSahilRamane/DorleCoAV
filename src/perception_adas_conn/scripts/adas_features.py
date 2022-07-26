@@ -88,6 +88,7 @@ class ADAS_Features:
             print("Either Flag is Zero")
             # if self.ROAD_SEG_RECEIVED == 1:
             #     self.ROAD_SEG_RECEIVED = 0
+            
             # elif self.MIO_DATA_RECEIVED == 1:
             #     self.MIO_DATA_RECEIVED = 0
             # # self.MIO_DATA_RECEIVED = 0
@@ -109,7 +110,11 @@ class ADAS_Features:
         brake, throttle = self.aeb.get_controls(relative_dist, relative_vel, ACC_set_speed, ttc, ego_acc, driver_brake, dt)
         # brake = self.stable_sigmoid(brake)
         # throttle = self.stable_sigmoid(throttle)
-        brake, throttle = brake/2, throttle/2
+        # brake, throttle = brake/2, throttle/2
+        brake = 1-math.exp(-1*brake)
+        brake = max(0, min(1, brake))
+        throttle = 1-math.exp(-1*throttle)
+        throttle = max(0, min(1, throttle))
         print(brake, throttle)
         # Fill twist message here ###
         control_message.linear.x = throttle
