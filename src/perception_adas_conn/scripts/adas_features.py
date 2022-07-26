@@ -7,7 +7,7 @@ from av_messages.msg import object_
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from carla_msgs.msg import CarlaEgoVehicleStatus 
-from adas_features import AEB_Controller
+from AEB_Controller import AEB_Controller
 # from geometry_msgs.msg import Accel
 
 class ADAS_Features:
@@ -16,6 +16,7 @@ class ADAS_Features:
         self.time_step = 0
         # self.bridge = CvBridge()
         self.aeb = AEB_Controller()
+        self.prv_dt = rospy.get_time()
 
 
     def subscribeToTopics(self):
@@ -30,17 +31,18 @@ class ADAS_Features:
                         self.getAccel, queue_size=1)
 
     def getAEBParams(self):
-        v1 = min(self.distance, self.MIO_position)
-        v2 = self.MIO_velocity
-        v3 = 20                                                  # constant for now should change later 
-        if v2 != 0:
-            v4 = v1/v2
+        relative_dist = min(self.drivable_distance, self.MIO_position)
+        relative_vel = self.MIO_velocity
+        ACC_set_speed = 20                                                  # constant for now should change later 
+        if ego_vel != 0:
+            ttc = relative_dist/relative_vel
         else:
-            v4 = inf
-        v5 = self.acceleration
-        v6 = driver_brake
-        v7 = dt
-        return v1, v2, v3, v4, v5, v6, v7
+            ttc = inf
+        ego_acc = self.acceleration
+        driver_brake = 0
+        dt = rospy.get_time() - self.prv_dt # add time stamps
+        self.prv_dt = rospy.get_time()
+        return relative_dist, relative_dist, ACC_set_speed, ttc, ego_acc, driver_brake, dt
 
 # MIO: MOST IMPORTANT OBJECT
 
@@ -50,32 +52,48 @@ class ADAS_Features:
         self.ego_veh_velocity_topicname = rospy.get_param("perception_adas_conn/ego_velocity","/carla/ego_vehicle/odometry")
         self.getAccel_topicname = rospy.get_param("perception_adas_conn/ego_accel", "/carla/ego_vehicle/vehicle_status")
         self.pub_topic_name = rospy.get_param("perception_adas_conn/adas_features_control", "/vehicle/controls") 
-    
+
     def publishToTopics(self):
         rospy.loginfo("Published to topics")
         self.ControlsPublisher = rospy.Publisher(
             self.pub_topic_name, Twist, queue_size=1)
-        
+
     def extractDataMIO(self, obj_data):
-        self.MIO_velocity = obj_data.object_state_dt
-        self.MIO_position = obj_data.position
+        if self.MIO_DATA_RECEIVED == 0:
+            self.MIO_velocity = obj_data.object_state_dt.y
+            self.MIO_position = obj_data.position.y
+            self.MIO_DATA_RECEIVED = 1
+            self.sync_data()
 
     def extractDataRoadSeg(self, seg_data):
-        self.go_flag = seg_data.linear.x
-        self.distance = seg_data.linear.y
+        if self.ROAD_SEG_RECEIVED == 0:
+            self.go_flag = seg_data.linear.x ## FLAG in linear.x
+            self.drivable_distance = seg_data.linear.y
+            self.ROAD_SEG_RECEIVED = 1
+            self.sync_data()
+
+    def sync_data(self): # Copy for Obj Detection
+        if self.ROAD_SEG_RECEIVED == 1 and self.MIO_DATA_RECEIVED == 1:
+            self.Algorithm()
+            self.MIO_DATA_RECEIVED = 0
+            self.ROAD_SEG_RECEIVED = 0
 
     def extractEgoVehVelocity(self, odometry):
-        self.ego_velocity_x = odometry.twist.linear.x # an extra twist might be req.
-        self.ego_velocity_y = odometry.twist.linear.y
-        self.ego_velocity_angular = odometry.angular.z
+        self.ego_velocity_x = odometry.twist.twist.linear.x
+        self.ego_velocity_y = odometry.twist.twist.linear.y
+        self.ego_velocity_angular = odometry.pose.pose.orientation.z
 
     def getAccel(self, acceleration):
-        self.acceleration = acceleration.Accel.linear.x # check if Accel is necessary
+        self.acceleration = acceleration.acceleration.linear.x
 
     def Algorithm(self):
-        relative_dist, ego_vel, ACC_set_speed, ttc, ego_acc, driver_brake, dt = self.getAEBParams()
-        controls = self.aeb.get_controls()
-        self.callPublisher(controls)
+        control_message = Twist()
+        relative_dist, relative_vel, ACC_set_speed, ttc, ego_acc, driver_brake, dt = self.getAEBParams()
+        brake, throttle = self.aeb.get_controls(relative_dist, relative_vel, ACC_set_speed, ttc, ego_acc, driver_brake, dt)
+        # Fill twist message here ###
+        control_message.linear.x = throttle
+        control_message.linear.y = brake
+        self.callPublisher(control_message)
 
     def callPublisher(self, controls):
         self.ControlsPublisher.publish(controls)
