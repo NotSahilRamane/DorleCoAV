@@ -100,9 +100,9 @@ class Detector:
 
             fcw_message.MIO = obj_message
             fcw_message.drivable_area = flag_message
-            print("fcw_message filled")
+            # print("fcw_message filled")
             self.toFCWPublisher.publish(fcw_message)
-            print("FCW Published")
+            # print("FCW Published")
             self.DEPTH_IMAGE_RECEIVED = 0
             self.RGB_IMAGE_RECEIVED = 0
 
@@ -146,14 +146,15 @@ class Detector:
                 for y in range(0, len(da_seg_mask[x]), 2):
                     if da_seg_mask[x][y] == 1 or ll_seg_mask[x][y]:
                         depth = depth_resized[x][y] # instead of x, y, give pixel coordinates of Bounding boxes
-                        
                         if depth <= 50.00:
                             lateral = (y - CX) * depth / FX
                             if lateral >= -1 and lateral <= 1:
                                 # print(lateral)
-                                if lateral in [-1.0, -0.5, 0.0, 0.5, 1.0]:
-                                    if depth > max_depth:
-                                        max_depth = depth
+                                # if lateral in [-1.0, -0.5, 0.0, 0.5, 1.0]:
+                                if depth > max_depth:
+                                    max_depth = depth
+                                    # print("Depth", depth)
+
             flag_message = Twist()
             if max_depth <= 30:
                 flag_message.linear.x = 1
@@ -161,6 +162,7 @@ class Detector:
             else:
                 flag_message.linear.x = 0
                 flag_message.linear.y = max_depth
+            # print("MAX DEPTH : ", max_depth)
             header = Header()
             header.stamp = rospy.Time.now()
             header.frame_id = 'ego_vehicle/rgb_front'
@@ -185,7 +187,7 @@ class Detector:
         # print("Tracker called")
         obj_message = object_()
         img, tracked_boxes = self.deepsort.do_object_detection(image)
-        print(tracked_boxes, "Tracked boxes")  
+        # print(tracked_boxes, "Tracked boxes")  
 
         orig_dim, CX, FX = self.calculateParamsForDistance(depth_image)
         self.callObjectTrackingPub(img)
@@ -194,15 +196,15 @@ class Detector:
             for x, y, id in tracked_boxes:
                 # print("Inside forloop main")
                 if self.loop_number == 0:
-                    print("loop 0")
+                    # print("loop 0")
                     depth = depth_image[y][x] # instead of x, y, give pixel coordinates of Bounding boxes
                     lateral = (x - CX) * depth / FX
-                    print(lateral, depth, id, "Veh coordinates")
+                    # print(lateral, depth, id, "Veh coordinates")
                     if lateral > -1.5 and lateral < 1.5:
                         self.last_obj_pos_depth = depth
                         self.last_obj_pos_lateral = lateral
                         self.id_to_track.append(id)
-                        print(self.id_to_track, "ID TO TRACK")
+                        # print(self.id_to_track, "ID TO TRACK")
 
                         # print(lateral, depth)
                         obj_message.class_.data  = "Some"
@@ -222,8 +224,8 @@ class Detector:
                         obj_message = self.empty_obj_msg()
 
                 elif self.loop_number == 1:
-                    print("loop 1")
-                    print(self.id_to_track)
+                    # print("loop 1")
+                    # print(self.id_to_track)
 
                     if id == self.id_to_track[-1]:
                         depth = depth_image[y][x] # instead of x, y, give pixel coordinates of Bounding boxes
@@ -243,7 +245,7 @@ class Detector:
                             obj_message.position.z = 0
 
                             # self.MIOPublisher.publish(obj_message)
-                            print("published loop 1") 
+                            # print("published loop 1") 
 
                             self.last_obj_pos_depth = depth
                             self.last_obj_pos_lateral = lateral
@@ -269,7 +271,7 @@ class Detector:
                             obj_message.position.z = 0
 
                             # self.MIOPublisher.publish(obj_message)
-                            print("published loop 1")
+                            # print("published loop 1")
                             
                             self.loop_number = 1
                             self.last_time = time.time()

@@ -4,11 +4,11 @@ import numpy as np
 import rospy
 import math
 
-from av_messages.msg import object_
-from geometry_msgs.msg import Twist
+from av_messages.msg import fcw_perception
 from nav_msgs.msg import Odometry
 from carla_msgs.msg import CarlaEgoVehicleStatus 
 from AEB_Controller import AEB_Controller
+from geometry_msgs.msg import Twist
 # from geometry_msgs.msg import Accel
 
 class ADAS_Features:
@@ -25,10 +25,8 @@ class ADAS_Features:
 
     def subscribeToTopics(self):
         rospy.loginfo('Subscribed to topics')
-        rospy.Subscriber(self.MIO_object_topicname, object_,
+        rospy.Subscriber(self.perception_data_topic_name, fcw_perception,
                         self.extractDataMIO, queue_size=1)
-        rospy.Subscriber(self.road_seg_topicname, Twist,
-                        self.extractDataRoadSeg, queue_size=1)
         rospy.Subscriber(self.ego_veh_velocity_topicname, Odometry,
                         self.extractEgoVehVelocity, queue_size=1)
         rospy.Subscriber(self.getAccel_topicname, CarlaEgoVehicleStatus,
@@ -51,8 +49,8 @@ class ADAS_Features:
 # MIO: MOST IMPORTANT OBJECT
 
     def loadParameters(self):
-        self.MIO_object_topicname = rospy.get_param("road/mio", "/road/mio") 
-        self.road_seg_topicname = rospy.get_param("road/deadahead", "/road/deadahead") 
+        self.perception_data_topic_name = rospy.get_param("perception_adas_conn/perception_data", "/perception/FCW") 
+        self.road_seg_topicname = rospy.get_param("perception_adas_conn/deadahead", "/road/deadahead") 
         self.ego_veh_velocity_topicname = rospy.get_param("perception_adas_conn/ego_velocity","/carla/ego_vehicle/odometry")
         self.getAccel_topicname = rospy.get_param("perception_adas_conn/ego_accel", "/carla/ego_vehicle/vehicle_status")
         self.pub_topic_name = rospy.get_param("perception_adas_conn/adas_features_control", "/vehicle/controls") 
@@ -63,36 +61,23 @@ class ADAS_Features:
             self.pub_topic_name, Twist, queue_size=1)
 
     def extractDataMIO(self, obj_data):
-        if self.MIO_DATA_RECEIVED == 0:
-            self.MIO_velocity = obj_data.object_state_dt.y
-            self.MIO_position = obj_data.position.y
-            self.MIO_DATA_RECEIVED = 1
-            print("MIO Filled")
-
-            self.sync_data()
-
-    def extractDataRoadSeg(self, seg_data):
-        if self.ROAD_SEG_RECEIVED == 0:
-            self.go_flag = seg_data.linear.x ## FLAG in linear.x
-            self.drivable_distance = seg_data.linear.y
-            self.ROAD_SEG_RECEIVED = 1
-            print("Seg Filled")
-            self.sync_data()
-
-    def sync_data(self): # Copy for Obj Detection
-        if self.ROAD_SEG_RECEIVED == 1 and self.MIO_DATA_RECEIVED == 1:
+        if obj_data.MIO.class_.data == "None":
+            if obj_data.drivable_area.linear.x == 1:
+                control_message = Twist()
+                control_message.linear.x = 0
+                control_message.linear.y = 1
+                self.callPublisher(control_message)
+            elif obj_data.drivable_area.linear.x == 0:
+                control_message = Twist()
+                control_message.linear.x = 1
+                control_message.linear.y = 0
+                self.callPublisher(control_message)
+        elif obj_data.MIO.class_.data == "Some":
+            self.MIO_velocity = obj_data.MIO.object_state_dt.y
+            self.MIO_position = obj_data.MIO.position.y
+            self.go_flag = obj_data.drivable_area.linear.x ## FLAG in linear.x
+            self.drivable_distance = obj_data.drivable_area.linear.y
             self.Algorithm()
-            self.MIO_DATA_RECEIVED = 0
-            self.ROAD_SEG_RECEIVED = 0
-        else:
-            print("Either Flag is Zero")
-            # if self.ROAD_SEG_RECEIVED == 1:
-            #     self.ROAD_SEG_RECEIVED = 0
-            
-            # elif self.MIO_DATA_RECEIVED == 1:
-            #     self.MIO_DATA_RECEIVED = 0
-            # # self.MIO_DATA_RECEIVED = 0
-            # self.ROAD_SEG_RECEIVED = 0
 
     def extractEgoVehVelocity(self, odometry):
         self.ego_velocity_x = odometry.twist.twist.linear.x
