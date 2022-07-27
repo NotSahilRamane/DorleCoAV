@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import rospy
-from object_tracking import Detector
+from perception_fcw import Detector
 
 
 def main():
-    rospy.init_node('object_tracking')
+    rospy.init_node('perception_fcw')
     detector = Detector()
     detector.subscribeToTopics()
     detector.publishToTopics()
