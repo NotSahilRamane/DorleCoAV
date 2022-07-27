@@ -39,7 +39,10 @@ def AEBCallback(data):
     global throttle, brake, AEB_FLAG
     throttle = data.linear.x
     brake = data.linear.y
-    AEB_FLAG = 1
+    if brake > 0.5:
+        AEB_FLAG = 1
+    else:
+        AEB_FLAG = 0
 
 def subscribe(client: mqtt_client):
     def on_message(client, userdata, msg):
@@ -53,7 +56,7 @@ def subscribe(client: mqtt_client):
             if AEB_FLAG == 1:
                 control_command.throttle = throttle
                 control_command.brake = brake
-                AEB_FLAG = 0
+                # AEB_FLAG = 0
             else:
                 control_command.throttle = float(m_separated[1])
                 control_command.brake = float(m_separated[3])
@@ -71,7 +74,7 @@ def subscribe(client: mqtt_client):
 
 def run():
     rospy.init_node('MQTT_Controller')
-    rospy.Subscriber("/AEB", Twist, AEBCallback)
+    rospy.Subscriber("/vehicle/controls", Twist, AEBCallback)
     client = connect_mqtt()
     subscribe(client)
     client.loop_forever()

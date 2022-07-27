@@ -66,6 +66,8 @@ class ADAS_Features:
                 control_message = Twist()
                 control_message.linear.x = 0
                 control_message.linear.y = 1
+                print("Road nearing end, Brakes engaged!")
+
                 self.callPublisher(control_message)
             elif obj_data.drivable_area.linear.x == 0:
                 control_message = Twist()
@@ -100,7 +102,9 @@ class ADAS_Features:
         brake = max(0, min(1, brake))
         throttle = 1-math.exp(-1*throttle)
         throttle = max(0, min(1, throttle))
-        print(brake, throttle)
+        # print(brake, throttle)
+        if brake != 0:
+            print("On a collision path, Brakes engaged!")
         # Fill twist message here ###
         control_message.linear.x = throttle
         control_message.linear.y = brake
