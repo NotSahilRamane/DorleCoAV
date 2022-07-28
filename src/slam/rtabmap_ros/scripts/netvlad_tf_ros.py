@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Using netvlad tensorflow-v1 implementation from https://github.com/uzh-rpg/netvlad_tf_open/
 # For ROS melodic, follow the following instructions to rebuild cv_bridge with Python3

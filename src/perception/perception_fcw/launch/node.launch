@@ -1,0 +1,4 @@
+<launch>
+    <node name="perception_fcw" pkg="perception_fcw" type="main.py" output="screen">
+    </node>
+</launch>

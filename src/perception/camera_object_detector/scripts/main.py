@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python33
 
 import rospy
 from camera_object_detector import Detector

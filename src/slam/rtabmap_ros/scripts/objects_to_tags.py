@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import rospy
 from apriltag_ros.msg import AprilTagDetectionArray
 from apriltag_ros.msg import AprilTagDetection

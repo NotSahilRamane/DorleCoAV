@@ -64,8 +64,9 @@ laneDetections.msg
 lanes.msg
 localPlan.msg
 map.msg
-object.msg
+object_.msg
 objects.msg
+fcw_perception.msg
 trafficLights.msg
 velAccel.msg
 wayPoint.msg
