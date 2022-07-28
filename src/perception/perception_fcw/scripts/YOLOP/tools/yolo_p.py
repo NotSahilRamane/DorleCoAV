@@ -7,7 +7,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
 
 
-
 # print(sys.path)
 import cv2
 import torch
@@ -43,7 +42,7 @@ class YOLOP_Class:
         self.iou_thresh=opt_iou_thres
         
         self.device = select_device(logger=None, device='gpu')
-        weights = '/home/dorleco/DorleCoAV/src/perception/road_segmentation/scripts/YOLOP/weights/End-to-end.pth' # path too long
+        weights = '/home/reuben/Projects/FCW-AEB/DorleCoAV/src/perception/perception_fcw/scripts/YOLOP/weights/End-to-end.pth' # path too long
         self.half = self.device.type != 'cpu'
 
         self.model = get_net(cfg)

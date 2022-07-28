@@ -1,0 +1,55 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/devel/include/**",
+        "/home/reuben/carla_ws/devel/include/**",
+        "/opt/ros/noetic/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/navigation/amcl/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/navigation/base_local_planner/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/navigation/carrot_planner/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/navigation/clear_costmap_recovery/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/navigation/costmap_2d/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/perception/depthai-ros/depthai_bridge/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/navigation/dwa_local_planner/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/perception/grid_map/grid_map_core/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/perception/grid_map/grid_map_costmap_2d/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/perception/grid_map/grid_map_cv/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/perception/grid_map/grid_map_demos/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/perception/grid_map/grid_map_filters/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/perception/grid_map/grid_map_loader/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/perception/grid_map/grid_map_octomap/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/perception/grid_map/grid_map_pcl/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/perception/grid_map/grid_map_ros/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/perception/grid_map/grid_map_rviz_plugin/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/perception/grid_map/grid_map_sdf/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/perception/grid_map/grid_map_visualization/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/navigation/map_server/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/navigation/move_base/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/navigation/move_slow_and_clear/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/navigation/nav_core/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/navigation/navfn/include/**",
+        "/home/reuben/carla_ws/src/ros_bridge/pcl_recorder/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/perception/pointcloud_to_laserscan/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/navigation/rotate_recovery/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/slam/rtabmap_ros/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/ublox/ublox_gps/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/ublox/ublox_msg_filters/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/ublox/ublox_msgs/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/ublox/ublox_serialization/include/**",
+        "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/navigation/voxel_grid/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

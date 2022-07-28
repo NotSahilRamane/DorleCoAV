@@ -8,5 +8,8 @@ src/carla-ros-bridge/catkin_ws/logs/
 src/carla-ros-bridge/catkin_ws/.catkin_tools/
 src/carla-ros-bridge/catkin_ws/src/ros-bridge/.pylintrc
 .catkin_tools/
+__pycache__/
+*.pyc
+
 
 

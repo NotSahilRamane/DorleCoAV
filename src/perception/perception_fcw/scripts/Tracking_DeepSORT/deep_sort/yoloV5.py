@@ -41,7 +41,7 @@ class YOLO_Fast(): # outputs tlbr bounding boxes
         self.YELLOW = (0, 255, 255)
         
         # Network & Classes
-        classesFile = "/home/dorleco/DorleCoAV/src/perception/object_tracking/scripts/Tracking_DeepSORT/data/labels/coco.names"
+        classesFile = "/home/reuben/Projects/FCW-AEB/DorleCoAV/src/perception/perception_fcw/scripts/Tracking_DeepSORT/data/labels/coco.names"
         self.classes = None
         # A handy way to read all the classes from a file, without needed to hardcode each one
         with open(classesFile, 'rt') as f:

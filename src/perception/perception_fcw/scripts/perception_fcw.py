@@ -30,9 +30,9 @@ class Detector:
         self.yolo_p = YOLOP_Class()
         self.RGB_IMAGE_RECEIVED = 0
         self.DEPTH_IMAGE_RECEIVED = 0
-        self.deepsort = DeepSORT(class_names_file='/home/dorleco/DorleCoAV/src/perception/perception_fcw/scripts/Tracking_DeepSORT/data/labels/coco.names', 
-                                yolo_model='/home/dorleco/DorleCoAV/src/perception/perception_fcw/scripts/Tracking_DeepSORT/deep_sort/onnx_models/yolov5s.onnx',
-                                model_filename='/home/dorleco/DorleCoAV/src/perception/perception_fcw/scripts/Tracking_DeepSORT/model_data/mars-small128.pb', visualize=True)
+        self.deepsort = DeepSORT(class_names_file='/home/reuben/Projects/FCW-AEB/DorleCoAV/src/perception/perception_fcw/scripts/Tracking_DeepSORT/data/labels/coco.names', 
+                                yolo_model='/home/reuben/Projects/FCW-AEB/DorleCoAV/src/perception/perception_fcw/scripts/Tracking_DeepSORT/deep_sort/onnx_models/yolov5s.onnx',
+                                model_filename='/home/reuben/Projects/FCW-AEB/DorleCoAV/src/perception/perception_fcw/scripts/Tracking_DeepSORT/model_data/mars-small128.pb', visualize=True)
         self.last_obj_pos_depth = 0
         self.last_obj_pos_lateral = 0
         self.last_time = 0

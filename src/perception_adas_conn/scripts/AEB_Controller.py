@@ -129,22 +129,23 @@ class AEB_Controller:
                 ACC_acc = self.PID_distance(error_y, dt)
                 self.previous_error_y = error_y
 
-            if ACC_acc > 1:
-                ACC_acc = 1
-                set_deacc_flag = 0
+            if ACC_acc > 0:
+                self.acceleration = ACC_acc
+                self.deceleration = 0 
+                
             elif ACC_acc < 0:
-                ACC_acc = abs(ACC_acc)
-                set_deacc_flag = 1
-            self.acceleration = ACC_acc
+                self.acceleration = 0
+                self.deceleration = abs(ACC_acc)
+        
 
         else:
             self.acceleration = 0 # provide carla accelerometer values / driver input 
-            set_deacc_flag = 0
+            self.deceleration = 0
             # self.velocity_offset_controlled = self.PID(error, dt)
             # self.previous_error = error
             # self.acceleration = self.velocity_offset_controlled
 
-        return self.acceleration, set_deacc_flag
+        return self.acceleration, self.deceleration
 
     def stopping_time(self, relative_vel, relative_dist):
         try:
@@ -224,10 +225,10 @@ class AEB_Controller:
         self.stop_bool = self.TTC_non_positive()
         self.FCW_Stopping_Time = self.stopping_time(relative_vel, relative_dist)
         self.PB1_Stopping_Time, self.PB2_Stopping_Time, self.FB_Stopping_Time = self.stopping_time_calc()
-        acc_acceleration, set_deacc_flag = self.acc_controller(dt)
+        acc_acceleration, acc_deceleration = self.acc_controller(dt)
         aeb_deceleration, aeb_status, fcw_status = self.AEB_state_machine()
-        if set_deacc_flag == 1:
-            brakecontrol = Brake_Control(acc_acceleration, aeb_deceleration, driver_brake)
+        if aeb_status == 1:
+            brakecontrol = Brake_Control(acc_deceleration, aeb_deceleration, driver_brake)
             brake_command = brakecontrol.final_decel()
             throttle_command = 0
         else:
@@ -267,21 +268,21 @@ class Throttle_control:
     def __init__(self, aeb_status, acc):
         self.aeb_status = aeb_status
         self.acc = acc
-        self.acc_bool = True
-        self.AEB_or_acc_bool = True
+        # self.acc_bool = True
+        self.AEB_or_acc_bool = False 
         self.throttle = 0
 
         
     def switch(self):
         
-        # check if acceleration is positive or negative
-        if self.acc <= 0:
-            self.acc_bool = True
-        else:
-            self.acc_bool = False
+        # # check if acceleration is positive or negative
+        # if self.acc <= 0:
+        #     self.acc_bool = True
+        # else:
+        #     self.acc_bool = False
 
         # check the aeb status
-        if (self.aeb_status is True) or (self.acc_bool is True):
+        if (self.aeb_status is True): # or (self.acc_bool is True):
             self.AEB_or_acc_bool = True
         else:
             self.AEB_or_acc_bool = False
