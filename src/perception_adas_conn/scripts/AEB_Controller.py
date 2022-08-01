@@ -129,11 +129,11 @@ class AEB_Controller:
                 ACC_acc = self.PID_distance(error_y, dt)
                 self.previous_error_y = error_y
 
-            if ACC_acc > 1:
-                ACC_acc = 1
+            if ACC_acc > 0:
+                # ACC_acc = ACC_acc*5/100*18
                 set_deacc_flag = 0
-            elif ACC_acc < 0:
-                ACC_acc = abs(ACC_acc)
+            elif ACC_acc <= 0:
+                ACC_acc = abs(ACC_acc*5/110*18)
                 set_deacc_flag = 1
             self.acceleration = ACC_acc
 
@@ -251,14 +251,18 @@ class Brake_Control:
         self.ACC_deacc = -1*ACC_deacc
         self.deceleration = deceleration
         self.driver_brake = driver_brake
-        self.brake = 2
+        self.brake = 2 #m/s
      
     def final_decel(self):
         if self.ACC_deacc > 0:
             self.ACC_deacc = self.ACC_deacc
         else:
             self.ACC_deacc = 0
-        brake_final = max(self.brake, self.ACC_deacc, self.deceleration)
+        brake_final = max(self.brake, self.ACC_deacc, self.deceleration) ## REMOVE ACC DEACC
+
+        if brake_final > 0:
+                brake_final = brake_final*5/100*18
+
         return brake_final
 
 #######################################################################
@@ -291,7 +295,12 @@ class Throttle_control:
             self.throttle = 0
         else:
             self.throttle = self.acc
+
+        if self.throttle > 0:
+                self.throttle = self.throttle*5/100*18
+
         return self.throttle
+
 ##########################################################################################
 
 
