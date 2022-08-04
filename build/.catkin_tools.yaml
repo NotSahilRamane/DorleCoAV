@@ -1,0 +1,6 @@
+devel_space: /home/mayur/LKA_LCA/devel
+install: false
+install_space: /home/mayur/LKA_LCA/install
+profile: default
+source_space: /home/mayur/LKA_LCA/src
+workspace: /home/mayur/LKA_LCA
