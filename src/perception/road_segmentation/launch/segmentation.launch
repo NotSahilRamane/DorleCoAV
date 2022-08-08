@@ -1,0 +1,4 @@
+<launch>
+    <node name="road_segmentation" pkg="road_segmentation" type="main.py" output="screen">
+    </node>
+</launch>
