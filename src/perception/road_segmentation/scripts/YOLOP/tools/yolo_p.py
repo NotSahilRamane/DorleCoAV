@@ -6,7 +6,7 @@ from pathlib import Path
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
 
-
+import numpy as np
 
 # print(sys.path)
 import cv2
@@ -131,7 +131,7 @@ class YOLOP_Class:
 
 # if __name__ == '__main__':
 
-#     vid_path = 'src/perception/road_segmentation/scripts/YOLOP/inference/rgb_streams/video_output.mp4'
+#     vid_path = '/home/dorleco/DorleCoAV/src/perception/road_segmentation/scripts/YOLOP/inference/rgb_streams/video_output.mp4'
 #     cap = cv2.VideoCapture(vid_path)
 
 #     # fps = cap.get(cv2.CAP_PROP_FPS)
@@ -146,6 +146,7 @@ class YOLOP_Class:
 #             ret, frame = cap.read()
 #             if ret:
 #                 det_frame, _, _ = yolo_p.detect(frame)
+#                 det_frame = det_frame.astype(np.uint8)
 #                 cv2.imshow("Output", det_frame)
 #                 # result.write(det_frame)
 #                 key = cv2.waitKey(1) & 0xFF
@@ -163,13 +164,14 @@ class YOLOP_Class:
 # if __name__ == '__main__':
 #     # vid_path = 'inference/rgb_streams/shortened_file-60fps.avi'
 #     # vid_path = 'inference/videos/1.mp4'
-#     vid_path = 'inference/rgb_streams/video_output.mp4'
+#     vid_path = '/home/dorleco/DorleCoAV/src/perception/road_segmentation/scripts/YOLOP/inference/rgb_streams/video_output.mp4'
 #     cap = cv2.VideoCapture(vid_path)
 #     fps = cap.get(cv2.CAP_PROP_FPS)
 #     size = (int(cap.get(3)), int(cap.get(4)))
 #     result = cv2.VideoWriter('out.mp4', 
 #                          cv2.VideoWriter_fourcc(*'MJPG'),
 #                          fps, size)
+#     yolo_p = YOLOP_Class()
 #     with torch.no_grad():
 #         while cap.isOpened():
 #             ret, frame = cap.read()
@@ -177,7 +179,7 @@ class YOLOP_Class:
 #             # frame = cv2.resize(frame, (320,540))
 #                 print(frame.shape)
 
-#                 det_frame = detect(frame)
+#                 det_frame = yolo_p.detect(frame)
 #                 result.write(det_frame)
 #                 cv2.imshow("Output", det_frame)
 #                 key = cv2.waitKey(1) & 0xFF
@@ -190,3 +192,25 @@ class YOLOP_Class:
 # cv2.destroyAllWindows()
 # cap.release()
 # result.release()
+
+
+if __name__ == '__main__':
+
+    vid_path = '/home/dorleco/DorleCoAV/src/perception/road_segmentation/scripts/YOLOP/inference/rgb_streams/video_output.mp4'
+    cap = cv2.VideoCapture(vid_path)
+    yolo_p = YOLOP_Class()
+    with torch.no_grad():
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if ret:
+                _, _, det_frame = yolo_p.detect(frame)
+                cv2.imshow("Output", det_frame)
+                key = cv2.waitKey(1) & 0xFF
+                if key == ord("q"):
+                    break
+            else:
+                break
+
+cv2.destroyAllWindows()
+# result.release()
+cap.release()
