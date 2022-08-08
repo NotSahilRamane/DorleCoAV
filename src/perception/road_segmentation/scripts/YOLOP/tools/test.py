@@ -127,6 +127,7 @@ def main():
         pin_memory=False,
         collate_fn=dataset.AutoDriveDataset.collate_fn
     )
+    # batch_size=cfg.TEST.BATCH_SIZE_PER_GPU * len(cfg.GPUS),
     print('load data finished')
 
     epoch = 0 #special for test

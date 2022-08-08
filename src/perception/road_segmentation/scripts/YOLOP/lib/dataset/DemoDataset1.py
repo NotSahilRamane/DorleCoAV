@@ -21,7 +21,7 @@ from ..utils import letterbox_for_img
 
 def LoadImages(img0):
     # Padded resize
-    img_size = 640
+    img_size = 320
     h0, w0 = img0.shape[:2]
     img, ratio, pad = letterbox_for_img(img0, new_shape=img_size, auto=True)
     h, w = img.shape[:2]
@@ -30,7 +30,7 @@ def LoadImages(img0):
     return img, img0, shapes
 
 # class LoadImages:  # for inference
-#     def __init__(self, image, img_size=640):
+#     def __init__(self, image, img_size=320):
 #         # p = str(Path(path))  # os-agnostic
 #         # p = os.path.abspath(p)  # absolute path
 #         # if '*' in p:

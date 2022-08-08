@@ -39,7 +39,7 @@ opt_device = 'gpu'
 opt_save_dir = 'src/perception/road_segmentation/scripts/YOLOP/inference/output'
 opt_weights = 'src/perception/road_segmentation/scripts/YOLOP/weights/End-to-end.pth'
 # opt_source = '/home/reuben/Projects/YOLOP/inference/images/0ace96c3-48481887.jpg'
-opt_img_size = 640
+opt_img_size = 320
 opt_conf_thres = 0.4
 opt_iou_thres = 0.3
 
@@ -148,7 +148,7 @@ if __name__ == '__main__':
     with torch.no_grad():
         while cap.isOpened():
             ret, frame = cap.read()
-            # frame = cv2.resize(frame, (640,540))
+            # frame = cv2.resize(frame, (320,540))
             # print(frame.shape)
 
             det_frame = detect(cfg, frame)

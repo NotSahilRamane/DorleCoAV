@@ -299,6 +299,7 @@ def main():
             pin_memory=cfg.PIN_MEMORY,
             collate_fn=dataset.AutoDriveDataset.collate_fn
         )
+        #batch_size=cfg.TEST.BATCH_SIZE_PER_GPU * len(cfg.GPUS),
         print('load data finished')
     
     if rank in [-1, 0]:

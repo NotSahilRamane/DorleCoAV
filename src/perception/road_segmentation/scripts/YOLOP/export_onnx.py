@@ -138,15 +138,15 @@ class MCnet(nn.Module):
         m = self.model[self.detector_index]  # Detect() module
         for mi, s in zip(m.m, m.stride):  # from
             b = mi.bias.view(m.na, -1)  # conv.bias(255) to (3,85)
-            b[:, 4] += math.log(8 / (640 / s) ** 2)  # obj (8 objects per 640 image)
+            b[:, 4] += math.log(8 / (320 / s) ** 2)  # obj (8 objects per 320 image)
             b[:, 5:] += math.log(0.6 / (m.nc - 0.99)) if cf is None else torch.log(cf / cf.sum())  # cls
             mi.bias = torch.nn.Parameter(b.view(-1), requires_grad=True)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--height', type=int, default=640)  # height
-    parser.add_argument('--width', type=int, default=640)  # width
+    parser.add_argument('--height', type=int, default=320)  # height
+    parser.add_argument('--width', type=int, default=320)  # width
     args = parser.parse_args()
 
     do_simplify = True
@@ -194,7 +194,7 @@ if __name__ == "__main__":
         raise e
 
     """
-    PYTHONPATH=. python3 ./export_onnx.py --height 640 --width 640
+    PYTHONPATH=. python3 ./export_onnx.py --height 320 --width 320
     PYTHONPATH=. python3 ./export_onnx.py --height 1280 --width 1280
     PYTHONPATH=. python3 ./export_onnx.py --height 320 --width 320
     """

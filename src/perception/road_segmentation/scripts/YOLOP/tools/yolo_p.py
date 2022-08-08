@@ -37,13 +37,13 @@ transform=transforms.Compose([
         ])
 
 class YOLOP_Class:
-    def __init__(self, img_size=640, opt_conf_thres = 0.4, opt_iou_thres = 0.3):
+    def __init__(self, img_size=320, opt_conf_thres = 0.4, opt_iou_thres = 0.3):
         
         self.conf_thresh=opt_conf_thres
         self.iou_thresh=opt_iou_thres
         
         self.device = select_device(logger=None, device='gpu')
-        weights = '/home/reuben/Projects/DorleCoAV/src/perception/road_segmentation/scripts/YOLOP/weights/End-to-end.pth' # path too long
+        weights = '/home/reuben/Projects/DorleCoAV/src/perception/road_segmentation/scripts/YOLOP/weights/End-to-end.pth'
         self.half = self.device.type != 'cpu'
 
         self.model = get_net(cfg)
@@ -62,12 +62,14 @@ class YOLOP_Class:
         self.model.eval()
 
     def detect(self, image):
+        torch.cuda.empty_cache()
         img, img_det, shapes = LoadImages(image)
         img = transform(img).to(self.device)
         img = img.half() if self.half else img.float()  # uint8 to fp16/32
         if img.ndimension() == 3:
             img = img.unsqueeze(0)
         # Inference
+        # print(img.shape)
         det_out, da_seg_out,ll_seg_out= self.model(img)
         inf_out, _ = det_out
 
@@ -93,11 +95,18 @@ class YOLOP_Class:
         ll_seg_mask = torch.nn.functional.interpolate(ll_predict, scale_factor=int(1/ratio), mode='bilinear')
         _, ll_seg_mask = torch.max(ll_seg_mask, 1)
         ll_seg_mask = ll_seg_mask.int().squeeze().cpu().numpy()
+        # print()
         # print(da_seg_mask.shape)
         # Lane line post-processing
         # ll_seg_mask = morphological_process(ll_seg_mask, kernel_size=7, func_type=cv2.MORPH_OPEN)
         # ll_seg_mask = connect_lane(ll_seg_mask)
-
+        # print(ll_seg_mask)
+        # unique_list = []
+        # for x in da_seg_mask:
+        # # check if exists in unique_list or not
+        #     if x not in unique_list:
+        #         unique_list.append(x)
+        # print(unique_list)
         img_det = show_seg_result(img_det, (da_seg_mask, ll_seg_mask), _, _, is_demo=True)
 
         # if len(det):
@@ -105,28 +114,49 @@ class YOLOP_Class:
         #     for *xyxy,conf,cls in reversed(det):
         #         label_det_pred = f'{self.names[int(cls)]} {conf:.2f}'
         #         plot_one_box(xyxy, img_det , label=label_det_pred, color=self.colors[int(cls)], line_thickness=2)
+    
+        # del ll_seg_mask
+        # del da_seg_mask
+        # del da_predict
+        # del det_pred
+        # del inf_out
+        # del ll_seg_out
+        # del ll_predict
+        # del da_seg_out
+        # del det_out
+        # del det
+        # del img
+        torch.cuda.empty_cache()
+        return da_seg_mask, ll_seg_mask, img_det #, da_seg_mask, ll_seg_mask
 
-        return img_det, da_seg_mask, ll_seg_mask
+if __name__ == '__main__':
 
-# if __name__ == '__main__':
+    vid_path = 'src/perception/road_segmentation/scripts/YOLOP/inference/rgb_streams/video_output.mp4'
+    cap = cv2.VideoCapture(vid_path)
 
-#     vid_path = 'src/perception/road_segmentation/scripts/YOLOP/inference/rgb_streams/video_output.mp4'
-#     cap = cv2.VideoCapture(vid_path)
-#     yolo_p = YOLOP_Class()
-#     with torch.no_grad():
-#         while cap.isOpened():
-#             ret, frame = cap.read()
-#             if ret:
-#                 det_frame, _, _ = yolo_p.detect(frame)
-#                 cv2.imshow("Output", det_frame)
-#                 key = cv2.waitKey(1) & 0xFF
-#                 if key == ord("q"):
-#                     break
-#             else:
-#                 break
+    # fps = cap.get(cv2.CAP_PROP_FPS)
+    # size = (int(cap.get(4)), int(cap.get(3)))
+    # result = cv2.VideoWriter('out.avi', 
+    #                      cv2.VideoWriter_fourcc(*'MJPG'),
+    #                      fps, size)
 
-# cv2.destroyAllWindows()
-# cap.release()
+    yolo_p = YOLOP_Class()
+    with torch.no_grad():
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if ret:
+                det_frame, _, _ = yolo_p.detect(frame)
+                cv2.imshow("Output", det_frame)
+                # result.write(det_frame)
+                key = cv2.waitKey(1) & 0xFF
+                if key == ord("q"):
+                    break
+            else:
+                break
+
+cv2.destroyAllWindows()
+# result.release()
+cap.release()
 
 
 
@@ -144,7 +174,7 @@ class YOLOP_Class:
 #         while cap.isOpened():
 #             ret, frame = cap.read()
 #             if ret:
-#             # frame = cv2.resize(frame, (640,540))
+#             # frame = cv2.resize(frame, (320,540))
 #                 print(frame.shape)
 
 #                 det_frame = detect(frame)

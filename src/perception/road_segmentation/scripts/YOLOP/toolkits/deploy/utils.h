@@ -36,7 +36,7 @@ static inline cv::Mat preprocess_img(cv::Mat& img, int input_w, int input_h) {
     
     cv::subtract(tensor, cv::Scalar(0.485, 0.456, 0.406), tensor, cv::noArray(), -1);
     cv::divide(tensor, cv::Scalar(0.229, 0.224, 0.225), tensor, 1, -1);
-    // std::cout << cv::format(out, cv::Formatter::FMT_NUMPY)<< std::endl;
+    // std::cout << cv::format(out, cv::Formatter::FMT_numpy)<< std::endl;
     // assert(false);
     // cv::Mat out(input_h, input_w, CV_8UC3);
     // cv::copyMakeBorder(re, out, y, y, x, x, cv::BORDER_CONSTANT, cv::Scalar(128, 128, 128));

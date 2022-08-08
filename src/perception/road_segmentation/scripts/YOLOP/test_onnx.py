@@ -7,7 +7,7 @@ import numpy as np
 from lib.core.general import non_max_suppression
 
 
-def resize_unscale(img, new_shape=(640, 640), color=114):
+def resize_unscale(img, new_shape=(320, 320), color=114):
     shape = img.shape[:2]  # current shape [height, width]
     if isinstance(new_shape, int):
         new_shape = (new_shape, new_shape)
@@ -34,7 +34,7 @@ def resize_unscale(img, new_shape=(640, 640), color=114):
     return canvas, r, dw, dh, new_unpad_w, new_unpad_h  # (dw,dh)
 
 
-def infer_yolop(weight="yolop-640-640.onnx",
+def infer_yolop(weight="yolop-320-320.onnx",
                 img_path="./inference/images/7dd9ef45-f197db95.jpg"):
 
     ort.set_default_logger_severity(4)
@@ -64,9 +64,9 @@ def infer_yolop(weight="yolop-640-640.onnx",
     img_rgb = img_bgr[:, :, ::-1].copy()
 
     # resize & normalize
-    canvas, r, dw, dh, new_unpad_w, new_unpad_h = resize_unscale(img_rgb, (640, 640))
+    canvas, r, dw, dh, new_unpad_w, new_unpad_h = resize_unscale(img_rgb, (320, 320))
 
-    img = canvas.copy().astype(np.float32)  # (3,640,640) RGB
+    img = canvas.copy().astype(np.float32)  # (3,320,320) RGB
     img /= 255.0
     img[:, :, 0] -= 0.485
     img[:, :, 1] -= 0.456
@@ -77,9 +77,9 @@ def infer_yolop(weight="yolop-640-640.onnx",
 
     img = img.transpose(2, 0, 1)
 
-    img = np.expand_dims(img, 0)  # (1, 3,640,640)
+    img = np.expand_dims(img, 0)  # (1, 3,320,320)
 
-    # inference: (1,n,6) (1,2,640,640) (1,2,640,640)
+    # inference: (1,n,6) (1,2,320,320) (1,2,320,320)
     det_out, da_seg_out, ll_seg_out = ort_session.run(
         ['det_out', 'drive_area_seg', 'lane_line_seg'],
         input_feed={"images": img}
@@ -162,11 +162,11 @@ def infer_yolop(weight="yolop-640-640.onnx",
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--weight', type=str, default="yolop-640-640.onnx")
+    parser.add_argument('--weight', type=str, default="yolop-320-320.onnx")
     parser.add_argument('--img', type=str, default="./inference/images/9aa94005-ff1d4c9a.jpg")
     args = parser.parse_args()
 
     infer_yolop(weight=args.weight, img_path=args.img)
     """
-    PYTHONPATH=. python3 ./test_onnx.py --weight yolop-640-640.onnx --img test.jpg
+    PYTHONPATH=. python3 ./test_onnx.py --weight yolop-320-320.onnx --img test.jpg
     """
