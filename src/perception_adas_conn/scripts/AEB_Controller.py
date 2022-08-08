@@ -133,7 +133,7 @@ class AEB_Controller:
                 # ACC_acc = ACC_acc*5/100*18
                 set_deacc_flag = 0
             elif ACC_acc <= 0:
-                ACC_acc = abs(ACC_acc/20)
+                ACC_acc = abs(ACC_acc/8)
                 set_deacc_flag = 1
                 
             self.acceleration = ACC_acc
@@ -207,7 +207,7 @@ class AEB_Controller:
             return self.deacc, self.aeb_status, self.fcw_status
         else: 
             a3 = "TTC negative! You have crashed!"
-            print(a3)
+            # print(a3)
             a2 = 0
             a1 = 0
             return a1, a2, a3
@@ -261,7 +261,7 @@ class Brake_Control:
         brake_final = max(self.brake, self.ACC_deacc, self.deceleration) ## REMOVE ACC DEACC
 
         if brake_final > 0:
-                brake_final = brake_final/20
+                brake_final = brake_final/8
 
         return brake_final
 
@@ -297,7 +297,7 @@ class Throttle_control:
             self.throttle = self.acc
 
         if self.throttle > 0:
-                self.throttle = self.throttle/20
+                self.throttle = self.throttle/8
 
         return self.throttle
 

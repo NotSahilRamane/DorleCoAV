@@ -16,10 +16,10 @@ topic = "python/mqtt"
 client_id = f'python-mqtt-{random.randint(0, 100)}'
 # username = 'emqx'
 # password = 'public'
-throttle = 1 
+throttle = 0 
 brake = 0
 AEB_FLAG = 0
-ACC_FLAG = 1
+ACC_FLAG = 0
 
 
 controlcommandPub = rospy.Publisher("/carla/ego_vehicle/vehicle_control_cmd", CarlaEgoVehicleControl, queue_size=1)
@@ -41,26 +41,29 @@ def AEBCallback(data):
     global throttle, brake, AEB_FLAG, ACC_FLAG
     throttle = data.linear.x
     brake = data.linear.y
-    if brake > 0.5:
+    if brake > 0:
         AEB_FLAG = 1
     else:
         AEB_FLAG = 0
-    if throttle > 0:
-        ACC_FLAG = 1
-    else:
-        ACC_FLAG = 0
+
+    # if throttle > 0:
+    #     ACC_FLAG = 1
+    # else:
+    #     ACC_FLAG = 0
+
+    print(throttle, brake, AEB_FLAG, ACC_FLAG)
 
 def subscribe(client: mqtt_client):
     def on_message(client, userdata, msg):
         control_command = CarlaEgoVehicleControl()
         global controlcommandPub
-        global throttle, brake, AEB_FLAG
+        global throttle, brake, AEB_FLAG, ACC_FLAG
         m_decode=str(msg.payload.decode())
         
         m_separated = m_decode.split(";")
         if m_separated[0] == "CheckFlag":
             if AEB_FLAG == 1:
-                control_command.throttle = throttle
+                control_command.throttle = 0
                 control_command.brake = brake
                 # AEB_FLAG = 0
             elif ACC_FLAG == 1:
@@ -70,7 +73,7 @@ def subscribe(client: mqtt_client):
                 control_command.throttle = float(m_separated[1])
                 control_command.brake = float(m_separated[3])
                 control_command.hand_brake = True if m_separated[5] == "True" else False
-            if brake == 1:
+            if brake > 0:
                     control_command.hand_brake = True
                     control_command.brake = 1
             control_command.reverse = True if m_separated[2] == "True" else False

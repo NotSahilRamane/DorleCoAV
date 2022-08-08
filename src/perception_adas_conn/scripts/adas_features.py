@@ -35,8 +35,8 @@ class ADAS_Features:
     def getAEBParams(self, AEB_Flag):
         if AEB_Flag == 1:
             relative_dist = min(self.drivable_distance, self.MIO_position)
-            relative_vel = self.MIO_velocity
-            ACC_set_speed = 20                                                  # constant for now should change later 
+            relative_vel = self.MIO_velocity + self.ego_velocity_x
+            ACC_set_speed = 8                                                # constant for now should change later 
             if relative_vel != 0:
                 ttc = relative_dist/relative_vel
             else:
@@ -44,10 +44,10 @@ class ADAS_Features:
             ego_acc = self.acceleration
             driver_brake = 0
         elif AEB_Flag == 0:
-            relative_dist = 1000
+            relative_dist = 100
             relative_vel = self.ego_velocity_x
             print(relative_vel, "Relative vel")
-            ACC_set_speed = 20                                                # constant for now should change later 
+            ACC_set_speed = 8                                                # constant for now should change later 
             ttc = float('inf')
             ego_acc = self.acceleration
             driver_brake = 0
