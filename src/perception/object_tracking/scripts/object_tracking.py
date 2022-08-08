@@ -94,7 +94,7 @@ class Detector:
         and the final publish function (To be done by sahil)
         '''
         points = []
-        img, tracked_boxes = self.deepsort.detect(image) # take care of case when tracked_boxes is empty
+        img, tracked_boxes = self.deepsort.do_object_detection(image) # take care of case when tracked_boxes is empty
         print(tracked_boxes)
 
         depth_resized = cv2.resize(depth_image, (640, 480), interpolation=cv2.INTER_AREA)   
