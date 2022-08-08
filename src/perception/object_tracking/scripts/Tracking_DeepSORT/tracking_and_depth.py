@@ -26,6 +26,32 @@ from Tracking_DeepSORT.tools import generate_detections as gdet
 # we import the yolo class we created in the previous project
 from Tracking_DeepSORT.deep_sort.yoloV5 import YOLO_Fast
 
+'''
+Comment code if running with ROS
+'''
+# # This is a function that takes our bounding boxes, and converts them into a list data type. 
+# from deep_sort import convert_boxes
+
+# # Here are the core deep-sort functions. 
+
+# # Pre-processing contains the code for the non-maxima suppresion
+# from deep_sort import preprocessing
+# # nn-matching contains all the code to implement the cost function to associate tracks
+# from deep_sort import nn_matching
+# # Here is a class to hold all the information in a single detection from yolo()
+# from deep_sort.detection import Detection
+# # Here is the Tracker class to hold all information regarding a tracked object. This is the key class - make sure to open up the files and understand
+# # the methods implemented
+# from deep_sort.tracker import Tracker
+# from tools import generate_detections as gdet
+
+# # we import the yolo class we created in the previous project
+# from deep_sort.yoloV5 import YOLO_Fast
+
+'''
+Comment code if running with ROS
+'''
+
 class DeepSORT:
 
     def __init__(self, class_names_file='/home/reuben/Projects/DorleCoAV/src/perception/object_tracking/scripts/Tracking_DeepSORT/data/labels/coco.names', 
@@ -140,7 +166,9 @@ class DeepSORT:
         return img_in, center_arr
 
 
-# vid = cv2.VideoCapture('/home/reuben/Projects/DorleCoAV/src/perception/object_tracking/scripts/Tracking_DeepSORT/data/video/test.mp4')
+# # vid = cv2.VideoCapture('/home/reuben/Projects/DorleCoAV/src/perception/object_tracking/scripts/Tracking_DeepSORT/data/video/test.mp4')
+# vid = cv2.VideoCapture('/home/reuben/Projects/YOLOP/inference/rgb_streams/video_output.mp4')
+
 
 # deepsort = DeepSORT()
 # while True:
