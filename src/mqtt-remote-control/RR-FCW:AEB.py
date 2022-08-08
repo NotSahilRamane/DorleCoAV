@@ -19,6 +19,8 @@ client_id = f'python-mqtt-{random.randint(0, 100)}'
 throttle = 1 
 brake = 0
 AEB_FLAG = 0
+ACC_FLAG = 1
+
 
 controlcommandPub = rospy.Publisher("/carla/ego_vehicle/vehicle_control_cmd", CarlaEgoVehicleControl, queue_size=1)
 
@@ -36,13 +38,17 @@ def connect_mqtt() -> mqtt_client:
     return client
 
 def AEBCallback(data):
-    global throttle, brake, AEB_FLAG
+    global throttle, brake, AEB_FLAG, ACC_FLAG
     throttle = data.linear.x
     brake = data.linear.y
     if brake > 0.5:
         AEB_FLAG = 1
     else:
         AEB_FLAG = 0
+    if throttle > 0:
+        ACC_FLAG = 1
+    else:
+        ACC_FLAG = 0
 
 def subscribe(client: mqtt_client):
     def on_message(client, userdata, msg):
@@ -57,6 +63,9 @@ def subscribe(client: mqtt_client):
                 control_command.throttle = throttle
                 control_command.brake = brake
                 # AEB_FLAG = 0
+            elif ACC_FLAG == 1:
+                control_command.throttle = throttle
+                control_command.brake = brake
             else:
                 control_command.throttle = float(m_separated[1])
                 control_command.brake = float(m_separated[3])

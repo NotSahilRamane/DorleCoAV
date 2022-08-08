@@ -103,7 +103,7 @@ class AEB_Controller:
     #def calculate_error(self, control, setpoint):
     #    self.error = setpoint - control
 
-    def acc_controller(self, dt):
+    def acc_controller(self, dt, acc_flag):
         
         if self.ACC_enable > 0:
             ACC_acc = 0
@@ -112,10 +112,10 @@ class AEB_Controller:
             self.brake_distance = self.relative_vel**2 / 2*self.deacc1
             
             sd = (1.2*self.relative_vel) + self.brake_distance + self.min_def_dist  ## PASS EGO VELOCITY, Brake DISTANCE
-            self.stopping_distance = (1.2*self.relative_vel) + self.brake_distance
+            # self.stopping_distance = (1.2*self.relative_vel) + self.brake_distance
             y = self.relative_dist - sd
             error_y = y
-
+            print(error, "Error Y")
             if self.ACC_state == 1 and y <= 0:                                                                  
                 self.ACC_state = 2
             elif self.ACC_state == 2 and (y >= 0.2*sd):                       
@@ -133,8 +133,9 @@ class AEB_Controller:
                 # ACC_acc = ACC_acc*5/100*18
                 set_deacc_flag = 0
             elif ACC_acc <= 0:
-                ACC_acc = abs(ACC_acc*5/110*18)
+                ACC_acc = abs(ACC_acc/20)
                 set_deacc_flag = 1
+                
             self.acceleration = ACC_acc
 
         else:
@@ -212,7 +213,7 @@ class AEB_Controller:
             return a1, a2, a3
     
         
-    def get_controls(self, relative_dist, relative_vel, ACC_set_speed, ttc, ego_acc, driver_brake, dt):
+    def get_controls(self, relative_dist, relative_vel, ACC_set_speed, ttc, ego_acc, driver_brake, dt, acc_flag):
         self.relative_dist = relative_dist
         self.relative_vel = relative_vel
         self.ACC_set_speed = ACC_set_speed
@@ -224,7 +225,7 @@ class AEB_Controller:
         self.stop_bool = self.TTC_non_positive()
         self.FCW_Stopping_Time = self.stopping_time(relative_vel, relative_dist)
         self.PB1_Stopping_Time, self.PB2_Stopping_Time, self.FB_Stopping_Time = self.stopping_time_calc()
-        acc_acceleration, set_deacc_flag = self.acc_controller(dt)
+        acc_acceleration, set_deacc_flag = self.acc_controller(dt, acc_flag)
         aeb_deceleration, aeb_status, fcw_status = self.AEB_state_machine()
         if set_deacc_flag == 1:
             brakecontrol = Brake_Control(acc_acceleration, aeb_deceleration, driver_brake)
@@ -242,7 +243,6 @@ class AEB_Controller:
     
         
         
-    
 
 ############################################################################
 class Brake_Control:
@@ -261,7 +261,7 @@ class Brake_Control:
         brake_final = max(self.brake, self.ACC_deacc, self.deceleration) ## REMOVE ACC DEACC
 
         if brake_final > 0:
-                brake_final = brake_final*5/100*18
+                brake_final = brake_final/20
 
         return brake_final
 
@@ -297,7 +297,7 @@ class Throttle_control:
             self.throttle = self.acc
 
         if self.throttle > 0:
-                self.throttle = self.throttle*5/100*18
+                self.throttle = self.throttle/20
 
         return self.throttle
 

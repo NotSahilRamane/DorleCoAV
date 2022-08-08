@@ -32,19 +32,28 @@ class ADAS_Features:
         rospy.Subscriber(self.getAccel_topicname, CarlaEgoVehicleStatus,
                         self.getAccel, queue_size=1)
 
-    def getAEBParams(self):
-        relative_dist = min(self.drivable_distance, self.MIO_position)
-        relative_vel = self.MIO_velocity
-        ACC_set_speed = 20                                                  # constant for now should change later 
-        if relative_vel != 0:
-            ttc = relative_dist/relative_vel
-        else:
+    def getAEBParams(self, AEB_Flag):
+        if AEB_Flag == 1:
+            relative_dist = min(self.drivable_distance, self.MIO_position)
+            relative_vel = self.MIO_velocity
+            ACC_set_speed = 20                                                  # constant for now should change later 
+            if relative_vel != 0:
+                ttc = relative_dist/relative_vel
+            else:
+                ttc = float('inf')
+            ego_acc = self.acceleration
+            driver_brake = 0
+        elif AEB_Flag == 0:
+            relative_dist = 1000
+            relative_vel = self.ego_velocity_x
+            print(relative_vel, "Relative vel")
+            ACC_set_speed = 20                                                # constant for now should change later 
             ttc = float('inf')
-        ego_acc = self.acceleration
-        driver_brake = 0
+            ego_acc = self.acceleration
+            driver_brake = 0
         dt = rospy.get_time() - self.prv_dt # add time stamps
         self.prv_dt = rospy.get_time()
-        return relative_dist, relative_dist, ACC_set_speed, ttc, ego_acc, driver_brake, dt
+        return relative_dist, relative_vel, ACC_set_speed, ttc, ego_acc, driver_brake, dt
 
 # MIO: MOST IMPORTANT OBJECT
 
@@ -71,9 +80,23 @@ class ADAS_Features:
                 self.callPublisher(control_message)
             elif obj_data.drivable_area.linear.x == 0:
                 control_message = Twist()
-                control_message.linear.x = 1
-                control_message.linear.y = 0
+                # control_message.linear.x = 1
+                # control_message.linear.y = 0
+                # self.callPublisher(control_message)
+                print("ACC FLAG 1")
+                relative_dist, relative_vel, ACC_set_speed, ttc, ego_acc, driver_brake, dt = self.getAEBParams(AEB_Flag=0)
+                print(relative_dist, relative_vel)
+                brake, throttle = self.aeb.get_controls(relative_dist, relative_vel, ACC_set_speed, ttc, ego_acc, driver_brake, dt, acc_flag=1)
+                # brake, throttle = self.aeb.get_controls(1000, self.ego_velocity_x, 80, 1200, self.acceleration, 0, dt)
+
+                brake = 1-math.exp(-1*brake)
+                brake = max(0, min(1, brake))
+                throttle = 1-math.exp(-1*throttle)
+                throttle = max(0, min(1, throttle))
+                control_message.linear.x = throttle
+                control_message.linear.y = brake
                 self.callPublisher(control_message)
+
         elif obj_data.MIO.class_.data == "Some":
             self.MIO_velocity = obj_data.MIO.object_state_dt.y
             self.MIO_position = obj_data.MIO.position.y
@@ -82,7 +105,9 @@ class ADAS_Features:
             self.Algorithm()
 
     def extractEgoVehVelocity(self, odometry):
+
         self.ego_velocity_x = odometry.twist.twist.linear.x
+        # print("Ego Velocity", self.ego_velocity_x)
         self.ego_velocity_y = odometry.twist.twist.linear.y
         self.ego_velocity_angular = odometry.pose.pose.orientation.z
         # print("EGO VEL RECEIVED")
@@ -93,8 +118,9 @@ class ADAS_Features:
 
     def Algorithm(self):
         control_message = Twist()
-        relative_dist, relative_vel, ACC_set_speed, ttc, ego_acc, driver_brake, dt = self.getAEBParams()
-        brake, throttle = self.aeb.get_controls(relative_dist, relative_vel, ACC_set_speed, ttc, ego_acc, driver_brake, dt)
+        relative_dist, relative_vel, ACC_set_speed, ttc, ego_acc, driver_brake, dt = self.getAEBParams(AEB_Flag=1)
+        
+        brake, throttle = self.aeb.get_controls(relative_dist, relative_vel, ACC_set_speed, ttc, ego_acc, driver_brake, dt, acc_flag=1)
         # brake = self.stable_sigmoid(brake)
         # throttle = self.stable_sigmoid(throttle)
         # brake, throttle = brake/2, throttle/2
@@ -109,17 +135,6 @@ class ADAS_Features:
         control_message.linear.x = throttle
         control_message.linear.y = brake
         self.callPublisher(control_message)
-
-    def stable_sigmoid(self, x):
-
-        if x >= 0:
-            z = math.exp(-x)
-            sig = 1 / (1 + z)
-            return sig
-        else:
-            z = math.exp(x)
-            sig = z / (1 + z)
-            return sig
 
     def callPublisher(self, controls):
         self.ControlsPublisher.publish(controls)
