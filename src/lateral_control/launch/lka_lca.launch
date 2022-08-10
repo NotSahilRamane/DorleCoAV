@@ -1,4 +1,4 @@
 <launch>
-    <node name="ros_architecture" pkg="lateral_control" type="main.py" output="screen">
+    <node name="lateral_lka_lca" pkg="lateral_control" type="main.py" output="screen">
     </node>
 </launch>
