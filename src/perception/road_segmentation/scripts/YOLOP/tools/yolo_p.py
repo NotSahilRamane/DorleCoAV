@@ -194,23 +194,23 @@ class YOLOP_Class:
 # result.release()
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
 
-    vid_path = '/home/dorleco/DorleCoAV/src/perception/road_segmentation/scripts/YOLOP/inference/rgb_streams/video_output.mp4'
-    cap = cv2.VideoCapture(vid_path)
-    yolo_p = YOLOP_Class()
-    with torch.no_grad():
-        while cap.isOpened():
-            ret, frame = cap.read()
-            if ret:
-                _, _, det_frame = yolo_p.detect(frame)
-                cv2.imshow("Output", det_frame)
-                key = cv2.waitKey(1) & 0xFF
-                if key == ord("q"):
-                    break
-            else:
-                break
+#     vid_path = '/home/dorleco/DorleCoAV/src/perception/road_segmentation/scripts/YOLOP/inference/rgb_streams/video_output.mp4'
+#     cap = cv2.VideoCapture(vid_path)
+#     yolo_p = YOLOP_Class()
+#     with torch.no_grad():
+#         while cap.isOpened():
+#             ret, frame = cap.read()
+#             if ret:
+#                 _, _, det_frame = yolo_p.detect(frame)
+#                 cv2.imshow("Output", det_frame)
+#                 key = cv2.waitKey(1) & 0xFF
+#                 if key == ord("q"):
+#                     break
+#             else:
+#                 break
 
-cv2.destroyAllWindows()
-# result.release()
-cap.release()
+# cv2.destroyAllWindows()
+# # result.release()
+# cap.release()

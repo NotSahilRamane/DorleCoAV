@@ -19,7 +19,7 @@ client_id = f'python-mqtt-{random.randint(0, 100)}'
 throttle = 0 
 brake = 0
 AEB_FLAG = 0
-ACC_FLAG = 0
+ACC_FLAG = 1
 
 
 controlcommandPub = rospy.Publisher("/carla/ego_vehicle/vehicle_control_cmd", CarlaEgoVehicleControl, queue_size=1)
