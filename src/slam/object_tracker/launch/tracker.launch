@@ -1,0 +1,4 @@
+<launch>
+    <node name="object_tracker" pkg="object_tracker" type="main.py" output="screen">
+    </node>
+</launch>
