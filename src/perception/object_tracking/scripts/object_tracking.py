@@ -7,7 +7,7 @@ import rospy
 from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import Image
 # from av_messages.msg import depthandimage
-from av_messages.msg import object_
+from av_messages.msg import objects, object_
 # from YOLOP.tools.yolo_p import YOLOP_Class
 from Tracking_DeepSORT.tracking_and_depth import DeepSORT
 
@@ -58,7 +58,7 @@ class Detector:
         # rospy.loginfo("Published to topics")
         self.DetectionsPublisher = rospy.Publisher(
             self.pub_topic_name, Image, queue_size=1)
-        self.MIOPublisher = rospy.Publisher("/road/mio", object_, queue_size=1)
+        self.MIOPublisher = rospy.Publisher("/road/mio", objects, queue_size=1)
 
     def storeImage(self, img): # Copy for Obj Detection
         if self.RGB_IMAGE_RECEIVED == 0:
@@ -106,7 +106,7 @@ class Detector:
         and the final publish function (To be done by sahil)
         '''
         # print("Tracker called")
-        obj_message = object_()
+        obj_message = objects()
         img, tracked_boxes = self.deepsort.do_object_detection(image)
         print(tracked_boxes, "Tracked boxes")
         # print(len(img), len(img[0]), "Image")
@@ -118,79 +118,33 @@ class Detector:
         self.callPublisher(img)
         # print("Image Published")
         for x, y, id in tracked_boxes:
+            single_obj = object_()
             # print("Inside forloop main")
-            if self.loop_number == 0:
-                print("loop 0")
-                depth = depth_image[y][x] # instead of x, y, give pixel coordinates of Bounding boxes
-                lateral = (x - CX) * depth / FX
-                print(lateral, depth, id, "Veh coordinates")
-                if lateral > -1.5 and lateral < 1.5:
-                    self.last_obj_pos_depth = depth
-                    self.last_obj_pos_lateral = lateral
-                    self.id_to_track.append(id)
-                    print(self.id_to_track, "ID TO TRACK")
+            # if self.loop_number == 0:
+            #     print("loop 0")
+            depth = depth_image[y][x] # instead of x, y, give pixel coordinates of Bounding boxes
+            lateral = (x - CX) * depth / FX
+            print(lateral, depth, id, "Veh coordinates")
+            # if lateral > -1.5 and lateral < 1.5:
+            self.last_obj_pos_depth = depth
+            self.last_obj_pos_lateral = lateral
+            self.id_to_track.append(id)
+            # print(self.id_to_track, "ID TO TRACK")
 
-                    # print(lateral, depth)
-                    obj_message.position.x = lateral
-                    obj_message.position.y = depth
-                    obj_message.id.data = id
-                    obj_message.object_state_dt.x = 0
-                    obj_message.object_state_dt.y= 0
+            # print(lateral, depth)
+            single_obj.position.x = lateral
+            single_obj.position.y = depth
+            single_obj.id.data = id
+            single_obj.object_state_dt.x = 0
+            single_obj.object_state_dt.y= 0
 
-                    obj_message.object_state_dt.theta = 0
-                    obj_message.position.z = 0
-                    self.loop_number = 1
-                    self.MIOPublisher.publish(obj_message)
-                    print("published loop 0")
-                    self.last_time = time.time()
-            elif self.loop_number == 1:
-                print("loop 1")
-                print(self.id_to_track)
-
-                if id == self.id_to_track[-1]:
-                    depth = depth_image[y][x] # instead of x, y, give pixel coordinates of Bounding boxes
-                    lateral = (x - CX) * depth / FX
-                    if lateral > -1.5 and lateral < 1.5:
-                        
-                        obj_message.position.x = lateral
-                        obj_message.position.y = depth
-                        obj_message.id.data = id
-                        this_time = time.time()
-                        obj_message.object_state_dt.x = (lateral - self.last_obj_pos_lateral) / (this_time - self.last_time)
-                        obj_message.object_state_dt.y = (lateral - self.last_obj_pos_lateral) / (this_time - self.last_time)
-                        self.last_obj_pos_depth = depth
-                        self.last_obj_pos_lateral = lateral
-                        obj_message.object_state_dt.theta = 0
-                        obj_message.position.z = 0
-
-                        self.MIOPublisher.publish(obj_message)
-                        print("published loop 1") 
-
-                        self.last_obj_pos_depth = depth
-                        self.last_obj_pos_lateral = lateral
-                        self.last_time = this_time
-                else:
-                    depth = depth_image[y][x] # instead of x, y, give pixel coordinates of Bounding boxes
-                    lateral = (x - CX) * depth / FX
-                    if lateral > -1.5 and lateral < 1.5:
-                        self.last_obj_pos_depth = depth
-                        self.last_obj_pos_lateral = lateral
-                        self.id_to_track.append(id)
-                        obj_message.position.x = lateral
-                        obj_message.position.y = depth
-                        obj_message.id.data = id
-                        obj_message.object_state_dt.x = 0
-                        obj_message.object_state_dt.y= 0
-
-                        obj_message.object_state_dt.theta = 0
-                        obj_message.position.z = 0
-
-                        self.MIOPublisher.publish(obj_message)
-                        print("published loop 1")
-                        
-                        self.loop_number = 1
-                        self.last_time = time.time()
-
+            single_obj.object_state_dt.theta = 0
+            single_obj.position.z = 0
+            obj_message.object_detections.append(single_obj)
+            # self.loop_number = 1
+        self.MIOPublisher.publish(obj_message)
+            # print("published loop 0")
+            # self.last_time = time.time()
 
 
     def callPublisher(self, image):
