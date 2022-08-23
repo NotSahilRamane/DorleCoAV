@@ -12,6 +12,7 @@ from sensor_msgs.msg import Image
 from geometry_msgs.msg import Twist
 from YOLOP.tools.yolo_p import YOLOP_Class
 from av_messages.msg import object_
+from geometry_msgs.msg import Point
 # from YOLOP.tools.yolo_p import YOLOP_Class
 from Tracking_DeepSORT.tracking_and_depth import DeepSORT
 from av_messages.msg import fcw_perception
@@ -64,7 +65,7 @@ class Detector:
         rospy.loginfo("Published to topics")
         self.roadSegPublisher = rospy.Publisher(
             self.ROAD_seg_pub_topic_name, Image, queue_size=1)
-        self.toFCWPublisher = rospy.Publisher("/perception/FCW", fcw_perception, queue_size=1)
+        self.toFCWPublisher = rospy.Publisher("/perception/FCW", Point, queue_size=1)
         self.DetectionsPublisher = rospy.Publisher(
             self.pub_topic_name, Image, queue_size=1)
 
@@ -93,14 +94,25 @@ class Detector:
 
     def sync_frames(self): # Copy for Obj Detection
         if self.RGB_IMAGE_RECEIVED == 1 and self.DEPTH_IMAGE_RECEIVED == 1:
-            fcw_message = fcw_perception()
+            fcw_message = Point()
             rgb_image1, depth_image1 = np.copy(self.rgb_image), np.copy(self.depth_image)
-            flag_message = self.callSegmentationModel(self.rgb_image, self.depth_image)
-            obj_message = self.callObjectDetector(rgb_image1, depth_image1)
+            drivable_area = self.callSegmentationModel(self.rgb_image, self.depth_image)
+            rel_distance, rel_velocity = self.callObjectDetector(rgb_image1, depth_image1)
+            
+            if rel_distance == -100:
+                fcw_message.x = drivable_area
+                fcw_message.y = 0
+                fcw_message.z = 0
+            else:
+                if drivable_area < rel_distance:
+                    fcw_message.x = drivable_area
+                    fcw_message.y = 0
+                    fcw_message.z = 0
+                else:
+                    fcw_message.x = rel_distance
+                    fcw_message.y = rel_velocity
+                    fcw_message.z = 0
 
-            fcw_message.MIO = obj_message
-            fcw_message.drivable_area = flag_message
-            # print("fcw_message filled")
             self.toFCWPublisher.publish(fcw_message)
             # print("FCW Published")
             self.DEPTH_IMAGE_RECEIVED = 0
@@ -155,21 +167,10 @@ class Detector:
                                     max_depth = depth
                                     # print("Depth", depth)
 
-            flag_message = Twist()
-            if max_depth <= 30:
-                flag_message.linear.x = 1
-                flag_message.linear.y = max_depth
-            else:
-                flag_message.linear.x = 0
-                flag_message.linear.y = max_depth
-            # print("MAX DEPTH : ", max_depth)
-            header = Header()
-            header.stamp = rospy.Time.now()
-            header.frame_id = 'ego_vehicle/rgb_front'
 
             print("Published")
             self.callPublisher(image_detections)
-            return flag_message
+            return max_depth
 
 
     def callPublisher(self, image):
@@ -179,7 +180,7 @@ class Detector:
         segmented_image = self.bridge.cv2_to_imgmsg(image, 'bgr8')
         self.roadSegPublisher.publish(segmented_image)
 
-    def callObjectDetector(self, image, depth_image): # Copy for Obj Detection remove for loops
+    def callObjectDetector(self, image, depth_image): 
         '''
         Call the segmentation model related functions here (Reuben, Mayur)
         and the final publish function (To be done by sahil)
@@ -188,42 +189,31 @@ class Detector:
         obj_message = object_()
         img, tracked_boxes = self.deepsort.do_object_detection(image)
         # print(tracked_boxes, "Tracked boxes")  
-
+        relative_distance = 0
+        relative_velocity = 0
         orig_dim, CX, FX = self.calculateParamsForDistance(depth_image)
         self.callObjectTrackingPub(img)
         # print("Image Published")
         if tracked_boxes != []:
             for x, y, id in tracked_boxes:
                 # print("Inside forloop main")
-                if self.loop_number == 0:
+                if self.loop_number == 0: ## PUBLISH OBJECT MESSAGE FOR MIO INITIAL LOOP, NO VELOCITY
                     # print("loop 0")
                     depth = depth_image[y][x] # instead of x, y, give pixel coordinates of Bounding boxes
                     lateral = (x - CX) * depth / FX
                     # print(lateral, depth, id, "Veh coordinates")
                     if lateral > -1.5 and lateral < 1.5:
-                        self.last_obj_pos_depth = depth
-                        self.last_obj_pos_lateral = lateral
+                        relative_distance = depth
                         self.id_to_track.append(id)
                         # print(self.id_to_track, "ID TO TRACK")
 
                         # print(lateral, depth)
-                        obj_message.class_.data  = "Some"
-                        obj_message.position.x = lateral
-                        obj_message.position.y = depth
-                        obj_message.id.data = id
-                        obj_message.object_state_dt.x = 0
-                        obj_message.object_state_dt.y= 0
-
-                        obj_message.object_state_dt.theta = 0
-                        obj_message.position.z = 0
                         self.loop_number = 1
                         # self.MIOPublisher.publish(obj_message)
                         print("published loop 0")
                         self.last_time = time.time()
-                    else:
-                        obj_message = self.empty_obj_msg()
 
-                elif self.loop_number == 1:
+                elif self.loop_number == 1: ## PUBLISH OBJECT MESSAGE FOR MIO Later LOOPs, With VELOCITY
                     # print("loop 1")
                     # print(self.id_to_track)
 
@@ -231,56 +221,27 @@ class Detector:
                         depth = depth_image[y][x] # instead of x, y, give pixel coordinates of Bounding boxes
                         lateral = (x - CX) * depth / FX
                         if lateral > -1.5 and lateral < 1.5:
-                            obj_message.class_.data = "Some"
-                            
-                            obj_message.position.x = lateral
-                            obj_message.position.y = depth ## Rel Distance
-                            obj_message.id.data = id
+                            relative_distance = depth
                             this_time = time.time()
-                            obj_message.object_state_dt.x = (lateral - self.last_obj_pos_lateral) / (this_time - self.last_time)
-                            obj_message.object_state_dt.y = (depth - self.last_obj_pos_depth) / (this_time - self.last_time) ## Rvx_act
+                            relative_velocity = (depth - self.last_obj_pos_depth) / (this_time - self.last_time) ## Rvx_act
                             self.last_obj_pos_depth = depth
-                            self.last_obj_pos_lateral = lateral
-                            obj_message.object_state_dt.theta = 0
-                            obj_message.position.z = 0
 
-                            # self.MIOPublisher.publish(obj_message)
-                            # print("published loop 1") 
-
-                            self.last_obj_pos_depth = depth
-                            self.last_obj_pos_lateral = lateral
                             self.last_time = this_time
-                        else:
-                            obj_message = self.empty_obj_msg()
-                    else:
-                        depth = depth_image[y][x] # instead of x, y, give pixel coordinates of Bounding boxes
+                    else:                                             ## NEW MIO ID Detected
+                        depth = depth_image[y][x] # instead of x, y, give pixel coordinates of Bounding boxes 
                         lateral = (x - CX) * depth / FX
                         if lateral > -1.5 and lateral < 1.5:
+                            relative_distance = depth
                             self.last_obj_pos_depth = depth
                             self.last_obj_pos_lateral = lateral
                             self.id_to_track.append(id)
-                            obj_message.class_.data = "Some"
 
-                            obj_message.position.x = lateral
-                            obj_message.position.y = depth
-                            obj_message.id.data = id
-                            obj_message.object_state_dt.x = 0
-                            obj_message.object_state_dt.y= 0
-
-                            obj_message.object_state_dt.theta = 0
-                            obj_message.position.z = 0
-
-                            # self.MIOPublisher.publish(obj_message)
-                            # print("published loop 1")
-                            
                             self.loop_number = 1
                             self.last_time = time.time()
-                        else:
-                            obj_message =  self.empty_obj_msg()
 
-            return obj_message
+            return relative_distance, relative_velocity
         else:
-            return self.empty_obj_msg()
+            return -100, -100
 
     def empty_obj_msg(self):
         obj_message = object_()
