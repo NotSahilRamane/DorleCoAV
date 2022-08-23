@@ -234,11 +234,11 @@ class Detector:
                             obj_message.class_.data = "Some"
                             
                             obj_message.position.x = lateral
-                            obj_message.position.y = depth
+                            obj_message.position.y = depth ## Rel Distance
                             obj_message.id.data = id
                             this_time = time.time()
                             obj_message.object_state_dt.x = (lateral - self.last_obj_pos_lateral) / (this_time - self.last_time)
-                            obj_message.object_state_dt.y = (lateral - self.last_obj_pos_lateral) / (this_time - self.last_time)
+                            obj_message.object_state_dt.y = (depth - self.last_obj_pos_depth) / (this_time - self.last_time) ## Rvx_act
                             self.last_obj_pos_depth = depth
                             self.last_obj_pos_lateral = lateral
                             obj_message.object_state_dt.theta = 0
