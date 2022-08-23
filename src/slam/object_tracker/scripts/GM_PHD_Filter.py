@@ -56,7 +56,7 @@ def set_model():
     model['p_D'] = 0.98  # Probability of target detection,
     model['p_S'] = 0.99  # Probability of target survival (prob_death = 1 - prob_survival)
     model['T'] = 10**-5  # Pruning weight threshold.
-    model['U'] = 4  # Merge distance threshold.
+    model['U'] = 0.5  # Merge distance threshold.
     model['w_thresh'] = 0.5  # State extraction weight threshold
 
     # Compute clutter intensity
@@ -235,10 +235,17 @@ class GM_PHD_Filter:
             L = []  # A vector of indices of merged Gaussian components.
             for iterI in range(len(I)):
                 this_I = copy.deepcopy(I[iterI])
+                # print("Updated intensity 1", updated_intensity['m'][this_I])
+                # print("Uodated intensiry 2", updated_intensity['m'][j])
                 delta_m = updated_intensity['m'][this_I] - updated_intensity['m'][j]
+                # print("deltam", delta_m)
+                # print("updated intensity", updated_intensity['P'][this_I])
                 mahal_dist = np.transpose(delta_m).dot(np.linalg.inv(
                     np.array(updated_intensity['P'][this_I], dtype=np.float64))).dot(delta_m)
+                print(mahal_dist, "Mahal dist")
+                print(self.model['U'],"Model U" ,"Fault check")
                 if mahal_dist <= self.model['U']:
+                    print("HENLO")
                     L.append(this_I)  # Indices of merged Gaussian components
 
             # The new weight of the resulted merged Gaussian is the summation of the weights of the Gaussian components.

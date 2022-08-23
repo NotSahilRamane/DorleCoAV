@@ -58,7 +58,7 @@ class Detector:
         # rospy.loginfo("Published to topics")
         self.DetectionsPublisher = rospy.Publisher(
             self.pub_topic_name, Image, queue_size=1)
-        self.MIOPublisher = rospy.Publisher("/road/mio", objects, queue_size=1)
+        self.MIOPublisher = rospy.Publisher("/perception/vision/data", objects, queue_size=1)
 
     def storeImage(self, img): # Copy for Obj Detection
         if self.RGB_IMAGE_RECEIVED == 0:

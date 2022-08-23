@@ -1,6 +1,4 @@
-"""
-This a demo of GM-PHD filter simulation for filtering multiple targets.
-"""
+#!/usr/bin/env python3
 
 import numpy as np
 import rospy
@@ -26,9 +24,10 @@ observations_list = []
 # Apply the GM-PHD filter for filtering of multiple targets (simulation)
 # for i in range(n_scan):
 def callback(data):
-
+    global pruned_intensity, pruned_intensity_list, estimates_list, target_states_list, observations_list
+    # print("Callback")
+    # print(data)
     # print(i)
-    state = np.eye(2, dtype=np.float64)
     Z_k = []
     # Generate target states, actual observations, and clutter
     # target_states = gen_new_states(model, target_states)
@@ -37,30 +36,35 @@ def callback(data):
     # clutter = gen_clutter(model)
     # print("Clutter", len(clutter))
     # Z_k = observations + clutter   # Add clutter to the observations to mimic cluttered environment
-    for obj in data.object_detections:
-        if obj.status == "Dynamic":
-            state[0] = obj.position.x
-            state[1] = obj.position.y
-            Z_k.append(state)
     
-    print("Z_k", len(Z_k))
-
+    for obj in data.object_detections:
+        # if obj.status == "Dynamic":
+        # state = np.eye(2, dtype=np.float64)
+        state = np.zeros((2, 1))
+        state[0] = float(obj.position.x)
+        # print(state[0])
+        state[1] = float(obj.position.y)
+        # print(state)
+        Z_k.append(state)
+    
+    # print("Z_k final sent", Z_k)
+    
 
     # Apply GM-PHD Filter
 
     # SAHIL GIVE READINGS INSIDE Z_k in the 
     Filter = GM_PHD_Filter(model)
     predicted_intensity = Filter.predict(Z_k, pruned_intensity)
+    # print(predicted_intensity)
     updated_intensity = Filter.update(Z_k, predicted_intensity)
+    # print(updated_intensity['m'])
+
     pruned_intensity = Filter.prune_and_merge(updated_intensity)
     estimates = Filter.extract_states(pruned_intensity)  # extracting estimates from the pruned intensity this gives
     # better result than extracting them from the updated intensity!
 
     estimated_states = estimates['m']
-    print(estimated_states)
-    # Plot ground-truth states, true observations, estimated states and clutter
-    # demo_plot(target_states, observations, estimated_states, clutter)
-
+    print(estimates['m'])
     # Store output intensity and estimates for analysis
     pruned_intensity_list.append(pruned_intensity)
     estimates_list.append(estimates)
