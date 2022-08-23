@@ -5,9 +5,11 @@ from perception_fcw import Detector
 
 def main():
     rospy.init_node('perception_fcw')
-    detector = Detector()
+    rate = rospy.Rate(3) #hz
+    detector = Detector(ros_rate=rate)
     detector.subscribeToTopics()
     detector.publishToTopics()
+    # rate.sleep()
     rospy.spin()
 
 

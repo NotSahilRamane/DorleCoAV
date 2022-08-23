@@ -23,7 +23,7 @@ import time
 from std_msgs.msg import Header
 
 class Detector:
-    def __init__(self):
+    def __init__(self, ros_rate):
         self.loadParameters()
         self.bridge = CvBridge()
         self.rgb_image = None
@@ -39,6 +39,8 @@ class Detector:
         self.last_time = 0
         self.id_to_track = []
         self.loop_number = 0
+        self.ros_rate = ros_rate
+        # self.rate = rospy.Rate(3)
         
 
     def subscribeToTopics(self):
@@ -114,6 +116,8 @@ class Detector:
                     fcw_message.z = 0
 
             self.toFCWPublisher.publish(fcw_message)
+            self.ros_rate.sleep()
+
             # print("FCW Published")
             self.DEPTH_IMAGE_RECEIVED = 0
             self.RGB_IMAGE_RECEIVED = 0
