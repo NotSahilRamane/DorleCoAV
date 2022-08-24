@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from cmath import inf
 import math
 from threading import Timer

@@ -1,3 +1,3 @@
 std_msgs/Header header
-float 32 lateralOffset
-float 32 RoadHeadingAngle
+float32 lateralOffset
+float32 RoadHeadingAngle
